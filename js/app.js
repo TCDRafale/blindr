@@ -14,6 +14,7 @@ const DEFAULTS = {
   animeVideo: true,
   score: true,
   chime: true,
+  airplay: false,
 };
 let S;
 try { S = { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; } catch { S = { ...DEFAULTS }; }
@@ -76,6 +77,8 @@ function renderSettings() {
   bindToggle($('optAnimeVideo'), 'animeVideo', true);
   bindToggle($('optScore'), 'score');
   bindToggle($('optChime'), 'chime');
+  $('optAirplay').checked = S.airplay;
+  $('optAirplay').onchange = () => { airplayAuto = false; setAirplay($('optAirplay').checked); };
   if (!animeVideoSupported()) {
     $('optAnimeVideo').closest('.toggle').classList.add('disabled');
     $('optAnimeVideo').closest('.toggle').querySelector('small').textContent = 'Non pris en charge par ce navigateur';
@@ -106,9 +109,14 @@ function placeSettings(slot) {
 // Deux lecteurs audio et deux lecteurs vidéo : pendant qu'un joue, l'autre précharge la manche suivante.
 const audios = [$('a0'), $('a1')];
 const videos = [$('video'), $('video2')];
+// AirPlay ne transmet ni le son passé par Web Audio, ni les extraits en mémoire (blob:) que le HomePod
+// ne peut pas télécharger : en mode AirPlay, un seul lecteur direct lit l'adresse Deezer.
+const plain = $('a2');
+const allMedia = [...audios, plain, ...videos];
 let audioIdx = 0;
 let videoIdx = 0;
 let actx = null;
+let airplayAuto = false; // mode AirPlay activé par le bouton Sortie (et non par le réglage)
 
 // Petit WAV silencieux : jouer un média pendant le geste de l'utilisateur débloque la lecture sur iOS.
 const SILENT = (() => {
@@ -122,7 +130,7 @@ const SILENT = (() => {
 })();
 
 function unlockMedia() {
-  for (const el of [...audios, ...videos]) {
+  for (const el of allMedia) {
     if (el.dataset.unlocked) continue;
     el.src = SILENT;
     const p = el.play();
@@ -130,7 +138,7 @@ function unlockMedia() {
   }
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-    actx.resume();
+    if (S.airplay) actx.suspend().catch(() => {}); else actx.resume();
     routeAudio();
   } catch { actx = null; }
 }
@@ -178,7 +186,7 @@ function fadeOut(el, s) {
 }
 
 function chime() {
-  if (!S.chime || !actx) return;
+  if (!S.chime || !actx || S.airplay) return;
   const t = actx.currentTime;
   [880, 1320].forEach((f, i) => {
     const o = actx.createOscillator(), g = actx.createGain();
@@ -192,7 +200,7 @@ function chime() {
 }
 
 function stopAllMedia() {
-  for (const el of [...audios, ...videos]) { try { el.pause(); } catch { /* ignore */ } }
+  for (const el of allMedia) { try { el.pause(); } catch { /* ignore */ } }
 }
 
 // Attend que le média ait assez de données pour démarrer (sans jamais échouer).
@@ -298,7 +306,10 @@ function prefetch() {
     if (q.cover) new Image().src = q.cover;
     // Un préchargement périmé (réglages changés entre-temps) ne doit pas toucher aux lecteurs.
     const current = () => G.next === p;
-    if (q.kind === 'audio') {
+    if (q.kind === 'audio' && S.airplay) {
+      // Lecteur unique : il sera chargé au début de la manche (AirPlay met de toute façon 1 à 2 s à démarrer).
+      q.el = null;
+    } else if (q.kind === 'audio') {
       // L'extrait Deezer (~480 Ko) est téléchargé en entier : la lecture démarre instantanément.
       try {
         const r = await fetch(q.src);
@@ -407,15 +418,19 @@ async function runRound() {
     if (el.src !== q.src) el.src = q.src;
     videoIdx = videos.indexOf(el);
     el.loop = false;
+  } else if (S.airplay) {
+    el = plain;
+    if (el.src !== q.src) el.src = q.src;
+    el.loop = true;
   } else {
-    el = q.el || audios[1 - audioIdx];
+    el = q.el && q.el !== plain ? q.el : audios[1 - audioIdx];
     const src = q.blobUrl || q.src;
     if (el.src !== src) el.src = src;
     audioIdx = audios.indexOf(el);
     el.loop = true; // extrait de 30 s : on boucle si deviner + réponse dépasse
   }
   // Coupe tout ce qui n'est ni l'ancien extrait (en fondu) ni le nouveau.
-  for (const m of [...audios, ...videos]) if (m !== el && m !== prev) m.pause();
+  for (const m of allMedia) if (m !== el && m !== prev) m.pause();
   try { el.currentTime = 0; } catch { /* ignore */ }
   G.el = el;
 
@@ -536,7 +551,31 @@ function setPaused(p) {
   if (!G.el || (G.phase !== 'guess' && G.phase !== 'reveal')) return;
   if (G.phase === 'reveal') pauseBackground(G.q, p);
   if (p) G.el.pause();
-  else { if (actx && actx.state !== 'running') actx.resume(); G.el.play().catch(() => {}); }
+  else { if (actx && actx.state !== 'running' && !S.airplay) actx.resume(); G.el.play().catch(() => {}); }
+}
+
+// Bascule du mode AirPlay, y compris en pleine manche : l'extrait en cours passe sur l'autre lecteur.
+function setAirplay(on) {
+  if (S.airplay === on) return;
+  S.airplay = on;
+  $('optAirplay').checked = on;
+  saveSettings();
+  G.next = null; // l'extrait préchargé visait l'autre lecteur
+  if (actx) (on ? actx.suspend() : actx.resume()).catch(() => {});
+  const q = G.q, cur = G.el;
+  if (!q || q.kind !== 'audio' || !cur || !game.classList.contains('active')) return;
+  const t = cur.currentTime;
+  const target = on ? plain : audios[audioIdx];
+  if (target === cur) return;
+  cur.pause();
+  target.src = on ? q.src : (q.blobUrl || q.src);
+  target.loop = true;
+  setGain(target, 1);
+  const seek = () => { try { target.currentTime = t; } catch { /* ignore */ } };
+  target.addEventListener('loadedmetadata', seek, { once: true });
+  G.el = target;
+  if (!G.paused && (G.phase === 'guess' || G.phase === 'reveal')) target.play().catch(() => {});
+  if (G.phase === 'guess' || G.phase === 'reveal') prefetch();
 }
 
 function updateScore() {
@@ -574,12 +613,20 @@ function toast(msg) {
 
 // ---------- Branchements ----------
 // Sortie audio : ouvre le sélecteur natif d'iOS (AirPods, Bluetooth, AirPlay…). Safari uniquement.
-if (typeof audios[0].webkitShowPlaybackTargetPicker === 'function') {
+// Le sélecteur est ouvert sur le lecteur direct, le seul qu'AirPlay sait transmettre.
+if (typeof plain.webkitShowPlaybackTargetPicker === 'function') {
   $('outputBtn').classList.remove('hidden');
   $('outputBtn').onclick = () => {
-    const el = G.el && typeof G.el.webkitShowPlaybackTargetPicker === 'function' ? G.el : audios[audioIdx];
+    unlockMedia();
+    if (!S.airplay) { airplayAuto = true; setAirplay(true); }
+    const el = G.q?.kind === 'video' && G.el ? G.el : plain;
     try { el.webkitShowPlaybackTargetPicker(); } catch { toast('Sélecteur de sortie indisponible'); }
   };
+  // Mode activé par le bouton : on revient aux fondus si l'appareil AirPlay est quitté.
+  plain.addEventListener('webkitcurrentplaybacktargetiswirelesschanged', () => {
+    if (plain.webkitCurrentPlaybackTargetIsWireless) toast('AirPlay connecté');
+    else if (airplayAuto) { airplayAuto = false; setAirplay(false); }
+  });
 }
 
 $('startBtn').onclick = startGame;

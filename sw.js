@@ -1,5 +1,5 @@
 // Met en cache l'interface pour un démarrage instantané. Les extraits restent en ligne.
-const CACHE = 'blindr-v5';
+const CACHE = 'blindr-v6';
 const SHELL = ['./', 'index.html', 'styles.css', 'js/app.js', 'js/sources.js', 'js/catalog.js', 'js/background.js',
   'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 

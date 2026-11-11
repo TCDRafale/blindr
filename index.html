@@ -146,12 +146,15 @@
       <label class="toggle"><span>Openings d'anime en vidéo<small>Vidéo officielle à la révélation (AnimeThemes)</small></span><input type="checkbox" id="optAnimeVideo"><i></i></label>
       <label class="toggle"><span>Compter les points</span><input type="checkbox" id="optScore"><i></i></label>
       <label class="toggle"><span>Son de révélation</span><input type="checkbox" id="optChime"><i></i></label>
+      <label class="toggle"><span>Mode AirPlay (HomePod, Apple TV)<small>À activer si le son ne passe pas en AirPlay. Les fondus entre extraits sont désactivés.</small></span><input type="checkbox" id="optAirplay"><i></i></label>
       <button id="resetHistory" class="ghost small">Réinitialiser l'historique des titres joués</button>
     </div>
   </div>
 
   <audio id="a0" preload="auto" playsinline crossorigin="anonymous" x-webkit-airplay="allow"></audio>
   <audio id="a1" preload="auto" playsinline crossorigin="anonymous" x-webkit-airplay="allow"></audio>
+  <!-- Lecteur direct pour AirPlay : pas de Web Audio, adresse réseau lisible par le HomePod. -->
+  <audio id="a2" preload="auto" playsinline x-webkit-airplay="allow"></audio>
   <div id="toast" class="toast"></div>
 
   <script type="module" src="js/app.js"></script>
