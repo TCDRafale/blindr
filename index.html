@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Blindr</title>
+  <meta name="description" content="Blind test infini : musique, films, séries, Disney, anime, jeux vidéo.">
+  <meta name="theme-color" content="#0a0a12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Blindr">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Accueil -->
+  <section id="home" class="screen active">
+    <div class="blobs"><i></i><i></i><i></i></div>
+    <div class="home-inner">
+      <header class="brand">
+        <div class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        <h1 class="logo">Blindr</h1>
+        <p class="tagline">Le blind test qui ne s'arrête jamais.</p>
+      </header>
+      <button id="startBtn" class="cta"><span class="cta-icon">▶</span> Lancer le blind test</button>
+      <p id="homeStatus" class="home-status"></p>
+      <div id="settingsHome" class="settings-slot"></div>
+    </div>
+  </section>
+
+  <!-- Partie -->
+  <section id="game" class="screen" data-phase="idle">
+    <div class="bg">
+      <div class="blobs"><i></i><i></i><i></i></div>
+      <img id="backdrop" class="backdrop" alt="">
+      <div id="bgLayer" class="bg-layer"></div>
+      <video id="video" class="video" playsinline webkit-playsinline preload="auto"></video>
+      <video id="video2" class="video" playsinline webkit-playsinline preload="auto"></video>
+      <div class="shade"></div>
+    </div>
+
+    <header class="topbar">
+      <button id="quitBtn" class="icon-btn" aria-label="Quitter">✕</button>
+      <div id="catChip" class="chip"></div>
+      <div id="scoreBox" class="score"></div>
+      <button id="outputBtn" class="icon-btn hidden" aria-label="Sortie audio">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="M12 15l5 6H7z"/></svg>
+      </button>
+      <button id="settingsBtn" class="icon-btn" aria-label="Réglages">⚙︎</button>
+    </header>
+
+    <main class="stage">
+      <div class="panel loading">
+        <div class="spinner"></div>
+        <p id="loadingText">Préparation des extraits…</p>
+        <button id="retryBtn" class="ghost hidden">Réessayer</button>
+      </div>
+
+      <div class="panel guess">
+        <div class="ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-track" cx="60" cy="60" r="54"/>
+            <circle id="ringBar" class="ring-bar" cx="60" cy="60" r="54"/>
+          </svg>
+          <div id="countdown" class="countdown">15</div>
+        </div>
+        <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="question">Qu'est-ce que c'est ?</p>
+        <p id="roundLabel" class="round-label"></p>
+      </div>
+
+      <div class="panel reveal">
+        <img id="cover" class="cover" alt="">
+        <div class="answer">
+          <h2 id="ansTitle" class="ans-title"></h2>
+          <p id="ansAlt" class="ans-alt"></p>
+          <p id="ansSub" class="ans-sub"></p>
+          <p id="ansMeta" class="ans-meta"></p>
+        </div>
+        <div id="judge" class="judge">
+          <button data-ok="1" class="judge-btn ok">✓ Trouvé</button>
+          <button data-ok="0" class="judge-btn ko">✗ Raté</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="controls">
+      <button id="pauseBtn" class="ctrl" aria-label="Pause">❚❚</button>
+      <button id="skipBtn" class="ctrl wide">Révéler</button>
+    </footer>
+    <div class="progress"><i id="progressBar"></i></div>
+    <div id="pausedOverlay" class="paused-overlay">En pause<small>Touchez ▶ pour reprendre</small></div>
+  </section>
+
+  <!-- Réglages pendant la partie -->
+  <div id="sheet" class="sheet" aria-hidden="true">
+    <div class="sheet-backdrop" data-close></div>
+    <div class="sheet-panel">
+      <div class="sheet-grab"></div>
+      <div class="sheet-head">
+        <h3>Réglages</h3>
+        <button class="pill" data-close>Reprendre</button>
+      </div>
+      <div id="settingsSheet" class="settings-slot"></div>
+    </div>
+  </div>
+
+  <!-- Réglages (déplacés entre l'accueil et la feuille) -->
+  <div id="settings" class="settings">
+    <div class="card">
+      <div class="card-head">
+        <h4>Catégories</h4>
+        <div class="mini-actions">
+          <button data-cats="all">Tout</button>
+          <button data-cats="none">Aucune</button>
+        </div>
+      </div>
+      <div id="catGrid" class="cat-grid"></div>
+    </div>
+
+    <div class="card">
+      <h4>Difficulté</h4>
+      <div id="diffSeg" class="segmented"></div>
+      <p id="diffHint" class="hint"></p>
+    </div>
+
+    <div class="card">
+      <label class="slider-row">
+        <span>Temps pour deviner</span><b id="guessVal"></b>
+        <input id="guessRange" type="range" min="5" max="30" step="1">
+      </label>
+      <label class="slider-row">
+        <span>Durée de la réponse</span><b id="revealVal"></b>
+        <input id="revealRange" type="range" min="3" max="20" step="1">
+      </label>
+    </div>
+
+    <div class="card toggles">
+      <label class="toggle"><span>Openings d'anime en vidéo<small>Vidéo officielle à la révélation (AnimeThemes)</small></span><input type="checkbox" id="optAnimeVideo"><i></i></label>
+      <label class="toggle"><span>Compter les points</span><input type="checkbox" id="optScore"><i></i></label>
+      <label class="toggle"><span>Son de révélation</span><input type="checkbox" id="optChime"><i></i></label>
+      <button id="resetHistory" class="ghost small">Réinitialiser l'historique des titres joués</button>
+    </div>
+  </div>
+
+  <audio id="a0" preload="auto" playsinline crossorigin="anonymous" x-webkit-airplay="allow"></audio>
+  <audio id="a1" preload="auto" playsinline crossorigin="anonymous" x-webkit-airplay="allow"></audio>
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
