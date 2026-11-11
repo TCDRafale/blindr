@@ -67,22 +67,26 @@
           </svg>
           <div id="countdown" class="countdown">15</div>
         </div>
-        <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <p class="question">Qu'est-ce que c'est ?</p>
-        <p id="roundLabel" class="round-label"></p>
+        <div class="guess-info">
+          <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="question">Qu'est-ce que c'est ?</p>
+          <p id="roundLabel" class="round-label"></p>
+        </div>
       </div>
 
       <div class="panel reveal">
         <img id="cover" class="cover" alt="">
-        <div class="answer">
-          <h2 id="ansTitle" class="ans-title"></h2>
-          <p id="ansAlt" class="ans-alt"></p>
-          <p id="ansSub" class="ans-sub"></p>
-          <p id="ansMeta" class="ans-meta"></p>
-        </div>
-        <div id="judge" class="judge">
-          <button data-ok="1" class="judge-btn ok">✓ Trouvé</button>
-          <button data-ok="0" class="judge-btn ko">✗ Raté</button>
+        <div class="reveal-text">
+          <div class="answer">
+            <h2 id="ansTitle" class="ans-title"></h2>
+            <p id="ansAlt" class="ans-alt"></p>
+            <p id="ansSub" class="ans-sub"></p>
+            <p id="ansMeta" class="ans-meta"></p>
+          </div>
+          <div id="judge" class="judge">
+            <button data-ok="1" class="judge-btn ok">✓ Trouvé</button>
+            <button data-ok="0" class="judge-btn ko">✗ Raté</button>
+          </div>
         </div>
       </div>
     </main>

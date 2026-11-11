@@ -12,6 +12,8 @@
   --radius: 20px;
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
   color-scheme: dark;
 }
 
@@ -52,7 +54,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 #home .blobs { position: fixed; }
 .home-inner {
   position: relative; z-index: 1; max-width: 560px; margin: 0 auto;
-  padding: calc(var(--sat) + 36px) 16px calc(var(--sab) + 40px);
+  padding: calc(var(--sat) + 36px) calc(var(--sar) + 16px) calc(var(--sab) + 40px) calc(var(--sal) + 16px);
 }
 .brand { text-align: center; margin-bottom: 26px; }
 .logo-mark { display: inline-flex; gap: 5px; align-items: flex-end; height: 38px; margin-bottom: 6px; }
@@ -169,7 +171,7 @@ video.bgvid { inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .topbar {
   position: absolute; z-index: 5; top: 0; left: 0; right: 0;
-  padding: calc(var(--sat) + 10px) 14px 10px;
+  padding: calc(var(--sat) + 10px) calc(var(--sar) + 14px) 10px calc(var(--sal) + 14px);
   display: flex; align-items: center; gap: 10px;
 }
 .icon-btn {
@@ -186,7 +188,7 @@ video.bgvid { inset: 0; width: 100%; height: 100%; object-fit: cover; }
 #game[data-phase=guess] .chip, #game[data-phase=reveal] .chip { opacity: 1; }
 .score { margin-left: auto; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 15px; }
 
-.stage { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; padding: calc(var(--sat) + 70px) 20px calc(var(--sab) + 110px); }
+.stage { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; padding: calc(var(--sat) + 70px) calc(var(--sar) + 20px) calc(var(--sab) + 110px) calc(var(--sal) + 20px); }
 .panel { grid-area: 1 / 1; width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0; pointer-events: none; transition: opacity .45s ease, transform .6s cubic-bezier(.2,.8,.2,1); transform: translateY(12px) scale(.98); }
 #game[data-phase=loading] .loading,
 #game[data-phase=guess] .guess,
@@ -196,11 +198,11 @@ video.bgvid { inset: 0; width: 100%; height: 100%; object-fit: cover; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading p { color: var(--muted); margin: 18px 0; }
 
-.ring { position: relative; width: min(58vw, 240px); aspect-ratio: 1; }
+.ring { position: relative; width: min(58vw, 240px); aspect-ratio: 1; flex: none; container-type: inline-size; }
 .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); filter: drop-shadow(0 0 18px color-mix(in srgb, var(--c) 70%, transparent)); }
 .ring-track { fill: rgba(0,0,0,.25); stroke: rgba(255,255,255,.1); stroke-width: 7; }
 .ring-bar { fill: none; stroke: var(--c); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 339.29; stroke-dashoffset: 0; }
-.countdown { position: absolute; inset: 0; display: grid; place-items: center; font-size: clamp(56px, 20vw, 88px); font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.04em; }
+.countdown { position: absolute; inset: 0; display: grid; place-items: center; font-size: clamp(56px, 20vw, 88px); font-size: 38cqw; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.04em; }
 .countdown.tick { animation: tick .35s ease; }
 @keyframes tick { 0% { transform: scale(1.18); } 100% { transform: scale(1); } }
 
@@ -214,6 +216,7 @@ video.bgvid { inset: 0; width: 100%; height: 100%; object-fit: cover; }
 @keyframes eq { 0%, 100% { height: 18%; } 50% { height: 100%; } }
 #game.paused .eq i, #game.paused .blobs i { animation-play-state: paused; }
 
+.guess-info, .reveal-text { display: flex; flex-direction: column; align-items: center; width: 100%; }
 .question { margin: 0; font-size: 24px; font-weight: 800; }
 .round-label { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
 
@@ -258,7 +261,7 @@ video.bgvid { inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .controls {
   position: absolute; z-index: 5; left: 0; right: 0; bottom: 0;
-  padding: 12px 16px calc(var(--sab) + 18px);
+  padding: 12px calc(var(--sar) + 16px) calc(var(--sab) + 18px) calc(var(--sal) + 16px);
   display: flex; gap: 10px; justify-content: center;
 }
 .ctrl {
@@ -286,7 +289,7 @@ video.bgvid { inset: 0; width: 100%; height: 100%; object-fit: cover; }
   position: absolute; left: 0; right: 0; bottom: 0; max-height: 86vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
   background: rgba(20, 18, 32, .92); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
   border-radius: 26px 26px 0 0; border-top: 1px solid var(--line);
-  padding: 8px 16px calc(var(--sab) + 24px);
+  padding: 8px calc(var(--sar) + 16px) calc(var(--sab) + 24px) calc(var(--sal) + 16px);
   transform: translateY(105%); transition: transform .4s cubic-bezier(.2,.8,.2,1);
 }
 .sheet.open { pointer-events: auto; }
@@ -305,13 +308,65 @@ video.bgvid { inset: 0; width: 100%; height: 100%; object-fit: cover; }
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* ---------- iPhone en paysage ---------- */
 @media (orientation: landscape) and (max-height: 500px) {
-  .ring { width: 150px; }
-  .eq { margin: 14px 0 10px; height: 30px; }
-  .cover { width: 150px; margin-bottom: 12px; }
-  .video { top: 0; height: 100%; }
-  #game.is-video .reveal { justify-content: flex-end; }
-  #game.is-video .ans-title { font-size: 30px; }
+  /* Accueil : plus compact, réglages sur deux colonnes */
+  .home-inner { max-width: 760px; padding-top: calc(var(--sat) + 18px); }
+  .brand { margin-bottom: 14px; }
+  .logo-mark { height: 26px; margin-bottom: 2px; }
+  .logo { font-size: 44px; }
+  .tagline { margin-top: 4px; font-size: 14px; }
+  .cta { padding: 14px; font-size: 18px; }
+  .home-status { margin: 8px 0 14px; }
+  .settings { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+  .settings > .card:first-child { grid-column: 1 / -1; }
+
+  /* Barre du haut plus fine */
+  .topbar { padding-top: calc(var(--sat) + 8px); padding-bottom: 6px; }
+  .icon-btn { width: 38px; height: 38px; font-size: 16px; }
+
+  /* Commandes en colonne sur la droite : toute la hauteur reste pour le jeu */
+  .controls {
+    top: 0; bottom: 0; left: auto; right: 0; width: calc(var(--sar) + 132px);
+    flex-direction: column; justify-content: center; align-items: center; gap: 12px;
+    padding: 56px calc(var(--sar) + 14px) calc(var(--sab) + 12px) 14px;
+  }
+  .ctrl { height: 48px; min-width: 48px; font-size: 15px; }
+  .ctrl.wide { flex: none; width: 104px; max-width: none; padding: 0 10px; }
+  .stage { padding: calc(var(--sat) + 54px) calc(var(--sar) + 140px) calc(var(--sab) + 14px) calc(var(--sal) + 24px); }
+  .panel { max-width: 640px; }
+
+  /* Devinette : compteur et question côte à côte */
+  .guess { flex-direction: row; justify-content: center; gap: 36px; text-align: left; }
+  .guess .ring { width: min(56vh, 210px); }
+  .guess-info { display: flex; flex-direction: column; align-items: flex-start; }
+  .eq { margin: 0 0 14px; height: 34px; }
+  .question { font-size: 24px; }
+
+  /* Révélation : pochette et réponse côte à côte */
+  .reveal { flex-direction: row; justify-content: center; align-items: center; gap: 28px; text-align: left; }
+  .cover { width: min(58vh, 230px); margin: 0; flex: none; }
+  .answer { min-width: 0; }
+  .ans-title { font-size: clamp(24px, 9vh, 42px); }
+  .ans-sub { font-size: 16px; margin-top: 8px; }
+  .ans-meta { margin-top: 8px; }
+  .reveal-text { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+  .judge { margin-top: 14px; }
+  .judge-btn { padding: 9px 16px; font-size: 14px; }
+
+  /* Avec vidéo en fond (clip, bande-annonce, opening) : texte en bas à gauche, la vidéo reste visible */
+  #game.has-bg .reveal, #game.is-video .reveal { height: 100%; align-items: flex-end; justify-content: flex-start; }
+  #game.has-bg .ans-title, #game.is-video .ans-title { font-size: clamp(22px, 8vh, 34px); }
+  /* Titres très longs (certains anime) : 3 lignes au plus pour ne pas cacher la vidéo */
+  .ans-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+  .answer, .reveal-text { max-width: 560px; }
+  .ans-alt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: 14px; }
+  .video { top: 0; height: 100%; box-shadow: none; }
+  .shade { background: linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 45%), linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 50%, rgba(0,0,0,.8) 100%); }
+
+  /* Réglages : feuille centrée, presque toute la hauteur */
+  .sheet-panel { max-height: 94vh; left: max(var(--sal), calc(50% - 380px)); right: max(var(--sar), calc(50% - 380px)); }
+  .toast { bottom: calc(var(--sab) + 18px); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
