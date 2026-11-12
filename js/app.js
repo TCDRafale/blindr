@@ -1,7 +1,7 @@
 import { CATEGORIES, CAT_BY_ID, DIFFICULTIES } from './catalog.js';
 import { nextQuestion, markPlayed, resetHistory, loadPool, animeVideoSupported, reportVideoFailure, findBackground, findImage } from './sources.js';
 import { initCatalog, openCatalog } from './catalogue.js';
-import { prepareBackground, startBackground, stopBackground, pauseBackground, stopAllBackgrounds } from './background.js';
+import { prepareBackground, startBackground, stopBackground, pauseBackground, stopAllBackgrounds, warmBackground, WARM_BEFORE_S } from './background.js';
 
 const $ = id => document.getElementById(id);
 
@@ -533,6 +533,8 @@ function loop() {
           cd.classList.remove('tick'); void cd.offsetWidth; cd.classList.add('tick');
         }
         $('progressBar').style.width = `${Math.min(100, (G.elapsed / total) * 100)}%`;
+        // Bande-annonce lancée cachée avant la révélation, le temps que les boutons du lecteur YouTube disparaissent.
+        if (left <= WARM_BEFORE_S) warmBackground(G.q);
         if (left <= 0) reveal();
       } else if (G.phase === 'reveal') {
         G.elapsed += dt;
