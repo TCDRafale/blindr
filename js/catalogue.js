@@ -1,8 +1,9 @@
-// Écran Catalogue : parcourir les titres de chaque catégorie, les écouter, exclure ou rétablir.
+// Écran Catalogue : parcourir le catalogue commun, écouter, exclure ou remettre en jeu, et copier ses corrections
+// pour qu'elles soient intégrées au catalogue de tous les appareils.
 import { CATEGORIES, CAT_BY_ID } from './catalog.js';
 import {
-  catalogItems, analyzeTrack, wikiPausedFor, trackPreview, animeCatalogPage, animeOpening,
-  excludeTrack, restoreTrack, excludeAnime, popCategories,
+  catalogRows, trackPreview, animeCatalogPage, animeOpening,
+  setExcluded, setKept, excludeAnime, correctionsText, guessName,
 } from './sources.js';
 
 const $ = id => document.getElementById(id);
@@ -14,10 +15,7 @@ const ANIME_PAGES = 20;    // 20 pages AniList de 50 = les 1 000 anime de la cat
 const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
-const C = {
-  cat: null, level: 'all', query: '', rows: [], shown: 0, list: [],
-  animePages: 0, loadingAnime: false, playing: null, analyzing: false, gen: 0,
-};
+const C = { cat: null, level: 'all', query: '', rows: [], shown: 0, list: [], animePages: 0, loadingAnime: false, playing: null, gen: 0 };
 let opts = {};
 const audio = $('catAudio');
 const video = $('catVideo');
@@ -46,24 +44,23 @@ export function initCatalog(o) {
   };
   $('catalogList').onclick = onListClick;
   $('catalogList').addEventListener('scroll', onScroll, { passive: true });
-  $('catalogAnalyzeBtn').onclick = () => (C.analyzing ? stopAnalysis() : analyze());
+  $('catalogCorrBtn').onclick = copyCorrections;
   for (const el of [audio, video]) el.addEventListener('ended', stopPlayback);
 }
 
 export function openCatalog(firstCat) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'catalog'));
+  updateCorrections();
   selectCat(C.cat || firstCat || 'films');
 }
 
 function closeCatalog() {
-  stopAnalysis();
   stopPlayback();
   C.gen++;
   opts.onClose?.();
 }
 
 async function selectCat(id) {
-  if (C.cat !== id) stopAnalysis();
   C.cat = id;
   const gen = ++C.gen;
   opts.setColor?.(id);
@@ -79,16 +76,12 @@ async function selectCat(id) {
   $('catalogList').scrollTop = 0;
   $('catalogList').innerHTML = '<p class="cat-empty">Chargement…</p>';
   $('catalogCount').textContent = '';
-  $('catalogAnalyze').classList.add('hidden');
   try {
-    if (id === 'anime') {
-      await loadAnimePages(4, gen);
-    } else {
-      const rows = await catalogItems(id);
-      if (gen !== C.gen) return;
-      C.rows = rows;
-    }
-  } catch (e) {
+    const rows = await catalogRows(id);
+    if (gen !== C.gen) return;
+    C.rows = rows;
+    if (id === 'anime') await loadAnimePages(2, gen);
+  } catch {
     if (gen !== C.gen) return;
     $('catalogList').innerHTML = '<p class="cat-empty">Impossible de charger cette catégorie.<br>Vérifie ta connexion.</p>';
     return;
@@ -117,11 +110,10 @@ function filtered() {
   const out = C.level === 'out';
   const rows = C.rows.filter(r => (out ? r.state !== 'ok' : r.state === 'ok' && (C.level === 'all' || r.level === C.level)) &&
     (!C.query || norm(`${r.name} ${r.sub}`).includes(C.query)));
-  // Anime : l'ordre AniList est déjà celui de la popularité.
-  if (C.cat !== 'anime') {
-    rows.sort((a, b) => (LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level]) || a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
-  }
-  return rows;
+  // Œuvres du catalogue triées par niveau puis par nom ; anime AniList dans leur ordre de popularité, à la suite.
+  const rank = r => (r.anime ? 1 : 0);
+  return rows.sort((a, b) => rank(a) - rank(b) ||
+    (a.anime ? 0 : (LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level]) || a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' })));
 }
 
 function render() {
@@ -130,9 +122,8 @@ function render() {
   C.shown = 0;
   list.innerHTML = '';
   updateHeader();
-  const approx = popCategories.includes(C.cat) && C.list.some(r => !r.exact);
-  if (approx && C.level !== 'out') {
-    list.insertAdjacentHTML('beforeend', '<p class="cat-legend">Niveau en pointillés : estimé d\'après Deezer, en attendant l\'analyse de l\'œuvre (Wikipédia). Les titres marqués « ? » ne sont pas encore identifiés.</p>');
+  if (C.level === 'out' && C.list.some(r => r.state === 'auto')) {
+    list.insertAdjacentHTML('beforeend', '<p class="cat-legend">Titres écartés par le tri automatique (avec la raison) et titres que tu as exclus. ↺ les remet dans le blind test.</p>');
   }
   if (!C.list.length) {
     const msg = C.level === 'out' ? 'Aucun titre écarté dans cette catégorie.' : C.query ? 'Aucun titre ne correspond.' : 'Aucun titre à ce niveau.';
@@ -147,7 +138,7 @@ function more() {
   const slice = C.list.slice(C.shown, C.shown + PAGE);
   list.insertAdjacentHTML('beforeend', slice.map(rowHtml).join(''));
   C.shown += slice.length;
-  const animeLeft = C.cat === 'anime' && C.animePages < ANIME_PAGES;
+  const animeLeft = C.cat === 'anime' && C.animePages < ANIME_PAGES && C.level !== 'out';
   if (C.shown < C.list.length || animeLeft) {
     const m = document.createElement('p');
     m.className = 'cat-more';
@@ -183,11 +174,11 @@ function rowHtml(r) {
   const out = r.state !== 'ok';
   const badge = out
     ? `<span class="lvl ${r.state}">${r.state === 'user' ? 'Exclu' : 'Écarté'}</span>`
-    : `<span class="lvl ${r.level}${r.exact ? '' : ' approx'}">${LEVEL_LABEL[r.level]}</span>`;
+    : `<span class="lvl ${r.level}">${r.kept ? 'Remis' : LEVEL_LABEL[r.level]}</span>`;
   const icon = CAT_BY_ID[C.cat]?.emoji || '🎵';
-  return `<div class="cat-row${out ? ' out' : ''}${C.playing === r.id ? ' playing' : ''}" data-id="${r.id}" role="button">
+  return `<div class="cat-row${out ? ' out' : ''}${C.playing === r.key ? ' playing' : ''}" data-key="${esc(r.key)}" role="button">
     <div class="thumb">${icon}${r.cover ? `<img src="${esc(r.cover)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>
-    <div class="txt"><div class="nm">${esc(r.name)}${r.checked ? '' : '<span class="unk">?</span>'}</div><div class="sb">${esc(r.sub)}</div></div>
+    <div class="txt"><div class="nm">${esc(r.name)}</div><div class="sb">${esc(r.sub)}</div></div>
     ${badge}
     <button class="row-act" data-act="${out ? 'restore' : 'exclude'}" aria-label="${out ? 'Remettre dans le jeu' : 'Exclure du jeu'}">${out ? '↺' : '✕'}</button>
   </div>`;
@@ -195,43 +186,63 @@ function rowHtml(r) {
 
 function updateHeader() {
   const ok = C.rows.filter(r => r.state === 'ok');
-  const n = ok.length;
-  const anime = C.cat === 'anime';
-  $('catalogCount').textContent = `${n}${anime && C.animePages < ANIME_PAGES ? '+' : ''} ${anime ? 'anime' : 'titres'}`;
-  // Analyse : seulement pour les catégories dont le niveau vient de la notoriété de l'œuvre.
-  const box = $('catalogAnalyze');
-  if (!popCategories.includes(C.cat)) { box.classList.add('hidden'); return; }
-  const todo = ok.filter(r => !r.checked).length;
-  box.classList.toggle('hidden', !todo && !C.analyzing);
-  if (!C.analyzing) {
-    $('catalogAnalyzeText').textContent = `${todo} titre${todo > 1 ? 's' : ''} pas encore analysé${todo > 1 ? 's' : ''} : œuvre et niveau à confirmer.`;
-    $('catalogAnalyzeBtn').textContent = 'Analyser';
-    $('catalogAnalyzeBtn').classList.remove('stop');
+  const anime = ok.filter(r => r.anime).length;
+  const own = ok.length - anime;
+  const isWork = CAT_BY_ID[C.cat]?.work;
+  const parts = [];
+  if (own || !anime) parts.push(`${own} ${C.cat === 'anime' ? 'génériques' : isWork ? 'œuvres' : 'titres'}`);
+  if (anime) parts.push(`${anime}${C.animePages < ANIME_PAGES ? '+' : ''} anime`);
+  $('catalogCount').textContent = parts.join(' · ');
+}
+
+function updateCorrections() {
+  const { n } = correctionsText();
+  $('catalogCorr').classList.toggle('hidden', !n);
+  $('catalogCorrText').textContent = `${n} correction${n > 1 ? 's' : ''} sur cet appareil. Copie-les et envoie-les à Claude pour les appliquer à tous tes appareils.`;
+}
+
+async function copyCorrections() {
+  const { text } = correctionsText();
+  try {
+    await navigator.clipboard.writeText(text);
+    opts.toast?.('Corrections copiées');
+  } catch {
+    window.prompt('Copie ce texte :', text);
   }
 }
 
-function rowOf(id) { return C.rows.find(r => String(r.id) === String(id)); }
+function rowOf(key) { return C.rows.find(r => r.key === key); }
 
 async function onListClick(e) {
   const rowEl = e.target.closest('.cat-row');
   if (!rowEl) return;
-  const r = rowOf(rowEl.dataset.id);
+  const r = rowOf(rowEl.dataset.key);
   if (!r) return;
   const act = e.target.closest('[data-act]')?.dataset.act;
   if (act === 'exclude') {
-    if (r.anime) excludeAnime(r.id, true); else excludeTrack(r.id);
-    r.state = 'user';
-    if (C.playing === r.id) stopPlayback();
+    if (r.anime) { excludeAnime(r.id, true); r.state = 'user'; }
+    else if (r.kept) { setKept(r.id, null); r.kept = false; r.state = 'auto'; r.name = r.raw.s; r.sub = `${r.raw.a} · ${r.raw.why}`; }
+    else { setExcluded(r.key, r.label, true); r.state = 'user'; }
+    if (C.playing === r.key) stopPlayback();
     rowEl.remove();
-    updateHeader();
+    updateHeader(); updateCorrections();
     opts.toast?.('Retiré du blind test');
     return;
   }
   if (act === 'restore') {
-    if (r.anime) excludeAnime(r.id, false); else restoreTrack(r.id);
+    if (r.anime) excludeAnime(r.id, false);
+    else if (r.state === 'auto') {
+      // Titre écarté par le tri : on demande sous quel nom il doit apparaître (l'œuvre, pour les catégories d'œuvres).
+      const isWork = CAT_BY_ID[C.cat]?.work;
+      const proposed = isWork ? guessName(C.cat, r.raw) : r.raw.s;
+      const name = isWork ? window.prompt('Nom de l\'œuvre à deviner :', proposed) : proposed;
+      if (name == null || !name.trim()) return;
+      setKept(r.id, { cat: C.cat, name: name.trim(), label: r.label });
+      r.kept = true; r.name = name.trim(); r.sub = `${r.raw.s} — ${r.raw.a} · remis en jeu`;
+    } else setExcluded(r.key, r.label, false);
     r.state = 'ok';
     rowEl.remove();
-    updateHeader();
+    updateHeader(); updateCorrections();
     opts.toast?.('Remis dans le blind test');
     return;
   }
@@ -240,7 +251,7 @@ async function onListClick(e) {
 
 // ---------- Écoute ----------
 async function togglePlay(r, rowEl) {
-  if (C.playing === r.id) { stopPlayback(); return; }
+  if (C.playing === r.key) { stopPlayback(); return; }
   stopPlayback();
   const el = r.anime ? video : audio;
   // iOS : la lecture doit démarrer pendant le geste ; on débloque le lecteur avant de chercher l'extrait.
@@ -248,11 +259,11 @@ async function togglePlay(r, rowEl) {
     el.src = opts.silent;
     el.play().then(() => { el.pause(); el.dataset.unlocked = '1'; }).catch(() => {});
   }
-  C.playing = r.id;
+  C.playing = r.key;
   rowEl.classList.add('loading');
   try {
     const src = r.anime ? await animeOpening(r.id) : await trackPreview(r.id);
-    if (C.playing !== r.id) return;
+    if (C.playing !== r.key) return;
     if (!src) throw new Error('aucun extrait');
     el.src = src;
     el.currentTime = 0;
@@ -260,7 +271,7 @@ async function togglePlay(r, rowEl) {
     rowEl.classList.remove('loading');
     rowEl.classList.add('playing');
   } catch {
-    if (C.playing === r.id) { stopPlayback(); opts.toast?.('Extrait indisponible'); }
+    if (C.playing === r.key) { stopPlayback(); opts.toast?.('Extrait indisponible'); }
   }
 }
 
@@ -268,53 +279,4 @@ function stopPlayback() {
   C.playing = null;
   for (const el of [audio, video]) { try { el.pause(); } catch { /* ignore */ } }
   document.querySelectorAll('.cat-row.playing, .cat-row.loading').forEach(x => x.classList.remove('playing', 'loading'));
-}
-
-// ---------- Analyse ----------
-async function analyze() {
-  const cat = C.cat;
-  const gen = C.gen;
-  C.analyzing = true;
-  $('catalogAnalyze').classList.remove('hidden');
-  $('catalogAnalyzeBtn').textContent = 'Arrêter';
-  $('catalogAnalyzeBtn').classList.add('stop');
-  const todo = C.rows.filter(r => r.state === 'ok' && !r.checked).map(r => r.id);
-  let done = 0, rejected = 0;
-  const text = $('catalogAnalyzeText');
-  for (let i = 0; i < todo.length && C.analyzing && gen === C.gen; ) {
-    const pause = wikiPausedFor();
-    if (pause) {
-      text.textContent = `Wikipédia demande une pause : reprise dans ${Math.ceil(pause / 1000)} s (${done}/${todo.length}).`;
-      await new Promise(r => setTimeout(r, Math.min(pause, 1000)));
-      continue;
-    }
-    text.textContent = `Analyse en cours… ${done}/${todo.length}${rejected ? ` · ${rejected} écarté${rejected > 1 ? 's' : ''}` : ''}`;
-    const res = await analyzeTrack(cat, todo[i]).catch(() => 'retry');
-    if (res === 'retry' && wikiPausedFor()) continue; // on retentera ce titre après la pause
-    if (res === 'rejected') rejected++;
-    done++; i++;
-    // Rafraîchit la liste de temps en temps (sans perdre la position de défilement).
-    if (done % 10 === 0 || i === todo.length) await refreshRows(cat, gen);
-  }
-  const finished = C.analyzing && gen === C.gen;
-  C.analyzing = false;
-  if (gen !== C.gen) return;
-  await refreshRows(cat, gen);
-  if (finished) opts.toast?.(`Analyse terminée${rejected ? ` · ${rejected} titre${rejected > 1 ? 's' : ''} écarté${rejected > 1 ? 's' : ''}` : ''}`);
-}
-
-async function refreshRows(cat, gen) {
-  const rows = await catalogItems(cat).catch(() => null);
-  if (!rows || gen !== C.gen || C.cat !== cat) return;
-  C.rows = rows;
-  const list = $('catalogList');
-  const top = list.scrollTop;
-  const shown = C.shown;
-  render();
-  while (C.shown < Math.min(shown, C.list.length)) more();
-  list.scrollTop = top;
-}
-
-function stopAnalysis() {
-  C.analyzing = false;
 }

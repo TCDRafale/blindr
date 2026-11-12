@@ -2,15 +2,25 @@
 
 Blind test infini pour iPhone, sous forme de web app (PWA) : pas de compilation, pas de signature Apple, pas d'expiration.
 
-## Contenu généré automatiquement
-- **Musique, films, séries, Disney, dessins animés, jeux vidéo** : extraits de 30 s tirés de playlists Deezer (API publique, sans clé). La popularité Deezer sert à régler la difficulté.
-- **Difficulté** : pour la musique et les jeux, popularité Deezer du morceau. Pour les films, séries, Disney et dessins animés, notoriété de l'œuvre en France (vues de sa page Wikipédia française), avec repli sur Deezer si Wikipédia ne répond pas.
-- **Une œuvre, une catégorie** : un titre présent dans plusieurs catégories est rangé dans la plus précise (Anime > Disney > Dessins animés > Séries > Films). Un anime assez populaire pour sortir en Anime n'apparaît pas en Dessins animés.
-- **Anime** : les openings et endings officiels en vidéo (AnimeThemes), choisis parmi les anime les plus populaires d'AniList. Si la vidéo ne passe pas, l'app se rabat sur des playlists Deezer d'anime.
+## Catalogue commun
+Le contenu de chaque catégorie est construit une fois, sur un ordinateur, et publié avec l'app : tous les appareils jouent le même catalogue.
 
-- **Vidéo de fond à la révélation** (muette) : extrait du clip officiel (Apple) pour la musique, bande-annonce YouTube référencée par Wikidata pour les films, séries, Disney et jeux. Sans vidéo trouvée, la pochette animée s'affiche.
-- **Catalogue** (accueil) : liste des titres de chaque catégorie avec leur niveau, recherche, écoute de l'extrait, exclusion ou remise en jeu d'un titre, et analyse d'une catégorie pour identifier les œuvres et mesurer leur notoriété.
-- **Sortie audio** : le bouton en haut à droite (sur iPhone) ouvre le sélecteur de sortie d'iOS.
+```bash
+node tools/build-catalog.mjs            # reconstruit data/catalog/ (réponses des API en cache dans tools/.cache)
+node tools/build-catalog.mjs --refresh  # re-télécharge aussi les playlists Deezer
+```
+
+- **Sources** : playlists Deezer de chaque catégorie (`js/catalog.js`), plus les œuvres les plus connues de Wikidata dont le thème est trouvé sur Deezer.
+- **Une œuvre, une catégorie** : chaque morceau est rattaché à une entité Wikidata, et c'est son type qui décide de la catégorie (film, film d'animation Disney, série, série animée, anime, émission, jeu). Les génériques français d'anime vont en Anime.
+- **Difficulté** : œuvres classées par vues de leur page Wikipédia française sur 12 mois, un tiers par niveau. Musique : popularité Deezer.
+- **Corrections** : `tools/overrides.json` (exclure, forcer une œuvre ou une catégorie, renommer, fixer un niveau), prioritaire sur le tri automatique. L'écran Catalogue de l'app permet d'exclure ou de remettre en jeu un titre et de copier ces corrections.
+- **Revue** : chaque construction produit `tools/review.html` (œuvres par niveau, titres écartés avec leur raison).
+
+## En jeu
+- **Extraits** : 30 s, lien Deezer frais demandé au moment de jouer.
+- **Anime** : openings japonais en vidéo (AnimeThemes, parmi les 1 000 anime les plus populaires d'AniList) et génériques français du catalogue.
+- **Vidéo de fond à la révélation** (muette) : clip officiel (Apple) pour la musique, bande-annonce YouTube (Wikidata) pour les œuvres.
+- **Sortie audio** : le bouton en haut à droite (sur iPhone) ouvre le sélecteur de sortie d'iOS ; mode AirPlay pour HomePod.
 
 ## Lancer en local
 ```bash
@@ -29,9 +39,12 @@ Autres options sans compte GitHub : Netlify Drop (glisser-déposer le dossier) o
 ## Structure
 - `index.html`, `styles.css` : interface
 - `js/catalog.js` : catégories, playlists Deezer, niveaux de difficulté
-- `js/sources.js` : génération des questions (Deezer, AniList, AnimeThemes)
+- `js/sources.js` : génération des questions à partir du catalogue (Deezer, AniList, AnimeThemes)
+- `js/names.js` : nettoyage des noms, commun à l'app et au script
+- `tools/build-catalog.mjs`, `tools/overrides.json` : construction et corrections du catalogue
+- `data/catalog/` : catalogue publié
 - `js/app.js` : moteur de jeu, réglages, lecture audio/vidéo
 - `js/catalogue.js` : écran Catalogue
 - `sw.js`, `manifest.webmanifest`, `icons/` : installation en app
 
-Ajouter une catégorie = ajouter une entrée dans `js/catalog.js` avec des identifiants de playlists Deezer.
+Ajouter une catégorie = ajouter une entrée dans `js/catalog.js` avec des identifiants de playlists Deezer, puis reconstruire le catalogue.

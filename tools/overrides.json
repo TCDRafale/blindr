@@ -1,0 +1,6 @@
+{
+  "_doc": "Corrections manuelles, prioritaires sur le tri automatique. tracks: par id Deezer → {out: true} pour exclure, {cat, work} pour forcer (work = Qid Wikidata ou nom libre), {name} pour renommer un titre musical. works: par Qid → {out, cat, name, level (0 facile, 1 moyen, 2 difficile)}. animeOut: ids AniList des anime à ne plus jouer en vidéo.",
+  "tracks": {},
+  "works": {},
+  "animeOut": []
+}
