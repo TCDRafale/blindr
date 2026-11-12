@@ -130,6 +130,17 @@ const GENERIC_ARTIST = /^(génériques?|generiques?|tv themes|soundtrack|various
 const REJECT_KEY = 'blindr.rejected2'; // v2 : règles de tri revues (séries, dessins animés)
 const rejected = new Set(load(REJECT_KEY, []));
 function reject(id) { rejected.add(id); save(REJECT_KEY, [...rejected]); }
+// Choix faits dans le catalogue : titres exclus à la main, et titres rétablis (gardés malgré le tri automatique).
+const USER_KEY = 'blindr.user';
+const userStore = load(USER_KEY, { out: [], keep: [], anime: [] });
+const userOut = new Set(userStore.out), kept = new Set(userStore.keep), animeOut = new Set(userStore.anime);
+const saveUser = () => save(USER_KEY, { out: [...userOut], keep: [...kept], anime: [...animeOut] });
+export function excludeTrack(id) { userOut.add(id); kept.delete(id); reject(id); saveUser(); }
+export function restoreTrack(id) {
+  userOut.delete(id); kept.add(id); rejected.delete(id);
+  save(REJECT_KEY, [...rejected]); saveUser();
+}
+export function excludeAnime(id, out = true) { out ? animeOut.add(id) : animeOut.delete(id); saveUser(); }
 
 // ---------- Réservoirs Deezer ----------
 const pools = {};        // catId -> [{ id, r }] trié du plus connu au moins connu
@@ -139,7 +150,8 @@ async function fetchPlaylist(pid, withWork) {
   try {
     const d = await jsonp(`${DZ}/playlist/${pid}/tracks?limit=400`);
     return (d.data || []).filter(t => t.preview && t.readable !== false).map(t => {
-      const item = { id: t.id, r: t.rank || 0 };
+      // t, a, al, m : titre, artiste, album, pochette (pour le catalogue et l'analyse sans requête Deezer).
+      const item = { id: t.id, r: t.rank || 0, t: t.title, a: t.artist?.name || '', al: t.album?.title || '', m: t.album?.md5_image || '' };
       const w = withWork && findWork(t.title, t.album?.title);
       if (w) item.w = workKey(w);
       return item;
@@ -156,7 +168,7 @@ const OWNER_ORDER = ['anime', 'disney', 'cartoons', 'series', 'films', 'games'];
 export function loadPool(catId) {
   if (pools[catId]) return Promise.resolve(pools[catId]);
   if (poolLoading[catId]) return poolLoading[catId];
-  const cached = load(`blindr.pool4.${catId}`, null);
+  const cached = load(`blindr.pool5.${catId}`, null);
   if (cached && Date.now() - cached.ts < POOL_TTL && cached.items.length > 20) {
     pools[catId] = cached.items;
     return Promise.resolve(cached.items);
@@ -175,7 +187,7 @@ export function loadPool(catId) {
     items.forEach((t, i) => (t.p = Math.round(1000 * i / items.length) / 1000)); // rang Deezer, 0 = le plus écouté
     if (items.length) {
       pools[catId] = items;
-      save(`blindr.pool4.${catId}`, { ts: Date.now(), items });
+      save(`blindr.pool5.${catId}`, { ts: Date.now(), items });
     }
     delete poolLoading[catId];
     return items;
@@ -199,6 +211,7 @@ function sliceRange(items, [a, b]) {
 // connu en France (« Hélène et les garçons », « Les Mystérieuses Cités d'or »), contrairement à la popularité
 // internationale ou aux écoutes de la BO sur Deezer.
 const POP_CATS = new Set(['films', 'series', 'disney', 'cartoons']);
+export const popCategories = [...POP_CATS];
 const PRIOR_RANGE = { easy: [0, 0.7], medium: [0, 0.9], hard: [0.15, 1], all: [0, 1] };
 // Œuvres d'autres catégories, repérées par leur description Wikipédia.
 const ANIM_DESC = /\banimation\b|dessins? animes?|serie animee|\bcartoon/;
@@ -331,6 +344,53 @@ async function workInfo(catId, name) {
 
 const validImg = url => url && !/\/images\/(artist|cover)\/\//.test(url);
 
+// Ce que représente un morceau : nom de l'œuvre (films, séries…), notoriété, ou null s'il est écarté
+// (pas une œuvre de la catégorie, ou œuvre d'une autre catégorie). undefined : service injoignable.
+// t : morceau Deezer ({ id, title, album: { title }, artist: { name } }).
+const IDENT_KEY = 'blindr.ident';
+const identCache = load(IDENT_KEY, {});      // id Deezer -> { n: nom affiché, v: vues/jour ou null }
+function rememberIdent(id, n, v) {
+  identCache[id] = { n, v };
+  const ids = Object.keys(identCache);
+  if (ids.length > 6000) ids.slice(0, ids.length - 6000).forEach(k => delete identCache[k]);
+  save(IDENT_KEY, identCache);
+}
+async function identify(catId, t) {
+  const cat = CAT_BY_ID[catId];
+  const keep = kept.has(t.id);
+  const drop = () => { if (keep) return false; reject(t.id); return true; };
+  const song = cleanTitle(t.title_short || t.title);
+  const artist = t.artist?.name || '';
+  let work = cat.work ? findWork(t.title, t.album?.title) : null;
+  // Disney : un album au nom court qui n'est pas une compilation porte le nom du film (« Pinocchio »).
+  const album = t.album?.title || '';
+  if (!work && catId === 'disney' && album && !COMPIL_RE.test(album) && norm(album) !== norm(t.title)) {
+    const w = cleanWork(album);
+    if (w && w.length <= 40) work = w;
+  }
+  if (catId === 'films' && /s[ée]rie|\bseries\b|tv show|netflix|hbo/i.test(`${t.title} ${album}`) && drop()) return null;
+  if ((cat.exclude?.test(cleanShowTitle(song)) || cat.excludeArtist?.test(artist)) && drop()) return null;
+  let title = work || song;
+  // Dessins animés : on vérifie toujours (une BO trouvée par l'album peut être celle d'une série, comme « JAG »).
+  if (cat.work && (!work || catId === 'cartoons')) {
+    const check = await checkWork(catId, album, work || song, artist).catch(() => undefined);
+    if (check === undefined) return undefined;
+    if (check === false && drop()) return null; // pas une œuvre de cette catégorie
+    if (typeof check === 'string') work = title = check;
+    else if (!work) title = cleanShowTitle(song); // séries, dessins animés : le titre est le nom de l'œuvre
+  }
+  let info = null;
+  if (POP_CATS.has(catId)) {
+    info = await workInfo(catId, title).catch(() => undefined);
+    // Œuvre qui appartient à une autre catégorie (Disney, anime, dessin animé).
+    if (info && OWNED_ELSEWHERE[catId]?.(info) && drop()) return null;
+    if (info !== undefined) rememberPop(t.id, info?.v ?? null);
+  }
+  if (catId === 'cartoons' && !keep && await inAnimeCategory(title).catch(() => false)) { reject(t.id); return null; }
+  if (cat.work) rememberIdent(t.id, title, info?.v ?? null);
+  return { song, artist, album, work, title, info };
+}
+
 async function deezerQuestion(catId, difficulty) {
   const items = await loadPool(catId);
   if (!items.length) throw new Error('pool vide');
@@ -355,38 +415,13 @@ async function deezerQuestion(catId, difficulty) {
     let t;
     try { t = await jsonp(`${DZ}/track/${candidate.id}`); } catch { continue; }
     if (!t || !t.preview) continue;
-    const song = cleanTitle(t.title_short || t.title);
-    const artist = t.artist?.name || '';
-    let work = cat.work ? findWork(t.title, t.album?.title) : null;
-    // Disney : un album au nom court qui n'est pas une compilation porte le nom du film (« Pinocchio »).
-    const album = t.album?.title || '';
-    if (!work && catId === 'disney' && album && !COMPIL_RE.test(album) && norm(album) !== norm(t.title)) {
-      const w = cleanWork(album);
-      if (w && w.length <= 40) work = w;
-    }
-    if (catId === 'films' && /s[ée]rie|\bseries\b|tv show|netflix|hbo/i.test(`${t.title} ${album}`)) { reject(t.id); continue; }
-    if (cat.exclude?.test(cleanShowTitle(song)) || cat.excludeArtist?.test(artist)) { reject(t.id); continue; }
-    let title = work || song;
-    // Dessins animés : on vérifie toujours (une BO trouvée par l'album peut être celle d'une série, comme « JAG »).
-    if (cat.work && (!work || catId === 'cartoons')) {
-      const check = await checkWork(catId, album, work || song, artist).catch(() => undefined);
-      if (check === undefined) continue;           // Wikidata injoignable : on essaie un autre titre
-      if (check === false) { reject(t.id); continue; } // pas une œuvre de cette catégorie
-      if (typeof check === 'string') work = title = check;
-      else if (!work) title = cleanShowTitle(song); // séries, dessins animés : le titre est le nom de l'œuvre
-    }
+    const id = await identify(catId, t);
+    if (!id) continue;                     // écarté, ou service injoignable : on essaie un autre titre
+    const { song, artist, album, work, title, info } = id;
     const wk = cat.work ? workKey(title) : '';
     if (isRecentWork(wk)) continue; // même œuvre jouée il y a moins de 100 extraits
     const songKey = cat.work ? '' : `s:${norm(artist.split(/,|&| feat/i)[0])}|${norm(song)}`;
     if (songKey && recent.has(songKey)) continue; // même chanson, autre version
-    let info = null;
-    if (POP_CATS.has(catId)) {
-      info = await workInfo(catId, title).catch(() => undefined);
-      // Œuvre qui appartient à une autre catégorie (Disney, anime, dessin animé).
-      if (info && OWNED_ELSEWHERE[catId]?.(info)) { reject(t.id); continue; }
-      if (info !== undefined) rememberPop(t.id, info?.v ?? null);
-    }
-    if (catId === 'cartoons' && await inAnimeCategory(title).catch(() => false)) { reject(t.id); continue; }
     const showArtist = artist && !GENERIC_ARTIST.test(artist);
     const year = (t.album?.release_date || t.release_date || '').slice(0, 4);
     const cover = validImg(t.album?.cover_xl) ? t.album.cover_xl : null;
@@ -477,7 +512,7 @@ async function animeQuestion(difficulty) {
   for (let attempt = 0; attempt < 4; attempt++) {
     const media = await anilistPage(a + rand(b - a + 1));
     await loadThemes(media.map(m => m.id));
-    const withThemes = media.filter(m => themesByAnilist[m.id]?.length);
+    const withThemes = media.filter(m => themesByAnilist[m.id]?.length && !animeOut.has(m.id));
     if (!withThemes.length) continue;
     const fresh = withThemes.filter(m => !isRecentWork(workKey(m.title.romaji)) && themesByAnilist[m.id].some(t => !recent.has(`at:${t.id}`)));
     if (!fresh.length && attempt < 3) continue; // tous déjà vus récemment : autre page
@@ -737,6 +772,85 @@ export async function findBackground(q) {
   }
   bgRemember(key, bg);
   return bg;
+}
+
+// ---------- Catalogue ----------
+// Niveau d'un rang de popularité (0 = le plus connu) : mêmes bornes que les niveaux de jeu.
+const levelOf = r => (r < 0.3 ? 'easy' : r < 0.65 ? 'medium' : 'hard');
+const coverUrl = m => (m ? `https://e-cdns-images.dzcdn.net/images/cover/${m}/112x112-000000-80-0-0.jpg` : null);
+
+// Nom provisoire d'un morceau pas encore analysé.
+function guessName(catId, it) {
+  return guessNameRaw(catId, it).replace(/^["“”«»\s]+|["“”«»\s]+$/g, '').replace(/^["“](.+?)["”]/, '$1') || cleanTitle(it.t || '');
+}
+function guessNameRaw(catId, it) {
+  const cat = CAT_BY_ID[catId];
+  if (!cat.work) return cleanTitle(it.t || '');
+  const w = findWork(it.t || '', it.al || '');
+  if (w) return w;
+  if (catId === 'series' || catId === 'cartoons' || catId === 'anime') return cleanShowTitle(cleanTitle(it.t || ''));
+  const a = cleanWork(it.al || '');
+  return a && !COMPIL_RE.test(it.al || '') ? a : cleanTitle(it.t || '');
+}
+
+// Lignes du catalogue pour une catégorie Deezer.
+export async function catalogItems(catId) {
+  const items = await loadPool(catId);
+  const cat = CAT_BY_ID[catId];
+  return items.map(it => {
+    const id = identCache[it.id];
+    const v = id?.v ?? popById[it.id];
+    const byPop = POP_CATS.has(catId) && v != null;
+    const song = cleanTitle(it.t || '');
+    const name = id?.n || guessName(catId, it);
+    return {
+      id: it.id,
+      name,
+      sub: cat.work ? [norm(song) !== norm(name) ? song : '', it.a && !GENERIC_ARTIST.test(it.a) ? it.a : ''].filter(Boolean).join(' — ') : it.a,
+      cover: coverUrl(it.m),
+      level: levelOf(byPop ? popRank(catId, v) : it.p ?? 0.5),
+      exact: !POP_CATS.has(catId) || byPop,       // niveau tiré de la notoriété réelle (sinon rang Deezer)
+      checked: !cat.work || !!id,                 // œuvre identifiée
+      state: userOut.has(it.id) ? 'user' : rejected.has(it.id) ? 'auto' : 'ok',
+    };
+  });
+}
+
+// Analyse d'un titre du catalogue (sans requête Deezer) : identifie l'œuvre et mesure sa notoriété.
+export async function analyzeTrack(catId, id) {
+  const it = (await loadPool(catId)).find(x => x.id === id);
+  if (!it || identCache[id] || rejected.has(id)) return 'skip';
+  const r = await identify(catId, { id, title: it.t || '', album: { title: it.al || '' }, artist: { name: it.a || '' } });
+  return r === undefined ? 'retry' : r ? 'ok' : 'rejected';
+}
+export const wikiPausedFor = () => Math.max(0, wikiPauseUntil - Date.now());
+
+// Extrait à jour (les liens Deezer expirent).
+export async function trackPreview(id) {
+  const t = await jsonp(`${DZ}/track/${id}`);
+  return t?.preview || null;
+}
+
+// Anime : les 1 000 plus populaires d'AniList, par pages de 50 (niveau selon la page, comme en jeu).
+export async function animeCatalogPage(page) {
+  const media = await anilistPage(page);
+  const level = page <= 2 ? 'easy' : page <= 6 ? 'medium' : 'hard';
+  return media.map(m => ({
+    id: m.id, anime: true,
+    name: m.title.english || m.title.romaji,
+    sub: [m.title.english && m.title.romaji !== m.title.english ? m.title.romaji : '', m.seasonYear || ''].filter(Boolean).join(' · '),
+    cover: m.coverImage?.extraLarge, level, exact: true, checked: true,
+    state: animeOut.has(m.id) ? 'user' : 'ok',
+  }));
+}
+export async function animeOpening(id) {
+  await loadThemes([id]);
+  const themes = themesByAnilist[id] || [];
+  const t = themes.find(x => x.type === 'OP') || themes[0];
+  if (!t) return null;
+  const entry = t.entries.find(e => !e.spoiler) || t.entries[0];
+  const v = [...entry.videos.nodes].sort((x, y) => (x.nc - y.nc) || (Math.abs((x.resolution || 720) - 720) - Math.abs((y.resolution || 720) - 720)))[0];
+  return v?.link || null;
 }
 
 // ---------- Point d'entrée ----------

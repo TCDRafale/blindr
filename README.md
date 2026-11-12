@@ -9,6 +9,7 @@ Blind test infini pour iPhone, sous forme de web app (PWA) : pas de compilation,
 - **Anime** : les openings et endings officiels en vidéo (AnimeThemes), choisis parmi les anime les plus populaires d'AniList. Si la vidéo ne passe pas, l'app se rabat sur des playlists Deezer d'anime.
 
 - **Vidéo de fond à la révélation** (muette) : extrait du clip officiel (Apple) pour la musique, bande-annonce YouTube référencée par Wikidata pour les films, séries, Disney et jeux. Sans vidéo trouvée, la pochette animée s'affiche.
+- **Catalogue** (accueil) : liste des titres de chaque catégorie avec leur niveau, recherche, écoute de l'extrait, exclusion ou remise en jeu d'un titre, et analyse d'une catégorie pour identifier les œuvres et mesurer leur notoriété.
 - **Sortie audio** : le bouton en haut à droite (sur iPhone) ouvre le sélecteur de sortie d'iOS.
 
 ## Lancer en local
@@ -30,6 +31,7 @@ Autres options sans compte GitHub : Netlify Drop (glisser-déposer le dossier) o
 - `js/catalog.js` : catégories, playlists Deezer, niveaux de difficulté
 - `js/sources.js` : génération des questions (Deezer, AniList, AnimeThemes)
 - `js/app.js` : moteur de jeu, réglages, lecture audio/vidéo
+- `js/catalogue.js` : écran Catalogue
 - `sw.js`, `manifest.webmanifest`, `icons/` : installation en app
 
 Ajouter une catégorie = ajouter une entrée dans `js/catalog.js` avec des identifiants de playlists Deezer.

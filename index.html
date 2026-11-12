@@ -27,8 +27,39 @@
       </header>
       <button id="startBtn" class="cta"><span class="cta-icon">▶</span> Lancer le blind test</button>
       <p id="homeStatus" class="home-status"></p>
+      <button id="catalogBtn" class="ghost catalog-btn">📚 Parcourir le catalogue</button>
       <div id="settingsHome" class="settings-slot"></div>
     </div>
+  </section>
+
+  <!-- Catalogue -->
+  <section id="catalog" class="screen">
+    <div class="blobs"><i></i><i></i><i></i></div>
+    <div class="cat-top">
+      <div class="cat-bar">
+        <button id="catalogBack" class="icon-btn" aria-label="Retour">‹</button>
+        <h2>Catalogue</h2>
+        <span id="catalogCount" class="cat-count"></span>
+      </div>
+      <div id="catalogTabs" class="cat-tabs"></div>
+      <div class="cat-filters">
+        <input id="catalogSearch" type="search" placeholder="Rechercher un titre, une œuvre, un artiste" autocomplete="off" autocorrect="off" spellcheck="false">
+        <div id="catalogLevels" class="segmented cat-levels">
+          <button data-level="all" class="on">Tous</button>
+          <button data-level="easy">Facile</button>
+          <button data-level="medium">Moyen</button>
+          <button data-level="hard">Difficile</button>
+          <button data-level="out">Écartés</button>
+        </div>
+      </div>
+      <div id="catalogAnalyze" class="cat-analyze hidden">
+        <p id="catalogAnalyzeText"></p>
+        <button id="catalogAnalyzeBtn" class="pill">Analyser</button>
+      </div>
+    </div>
+    <div id="catalogList" class="cat-list"></div>
+    <video id="catVideo" class="hidden" playsinline webkit-playsinline preload="none"></video>
+    <audio id="catAudio" preload="none" playsinline x-webkit-airplay="allow"></audio>
   </section>
 
   <!-- Partie -->

@@ -1,6 +1,6 @@
 // Met en cache l'interface pour un démarrage instantané. Les extraits restent en ligne.
-const CACHE = 'blindr-v8';
-const SHELL = ['./', 'index.html', 'styles.css', 'js/app.js', 'js/sources.js', 'js/catalog.js', 'js/background.js',
+const CACHE = 'blindr-v9';
+const SHELL = ['./', 'index.html', 'styles.css', 'js/app.js', 'js/sources.js', 'js/catalog.js', 'js/background.js', 'js/catalogue.js',
   'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

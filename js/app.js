@@ -1,5 +1,6 @@
 import { CATEGORIES, CAT_BY_ID, DIFFICULTIES } from './catalog.js';
 import { nextQuestion, markPlayed, resetHistory, loadPool, animeVideoSupported, reportVideoFailure, findBackground, findImage } from './sources.js';
+import { initCatalog, openCatalog } from './catalogue.js';
 import { prepareBackground, startBackground, stopBackground, pauseBackground, stopAllBackgrounds } from './background.js';
 
 const $ = id => document.getElementById(id);
@@ -630,6 +631,16 @@ if (typeof plain.webkitShowPlaybackTargetPicker === 'function') {
 }
 
 $('startBtn').onclick = startGame;
+initCatalog({
+  toast, silent: SILENT,
+  setColor: id => setColor(id),
+  onClose: () => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'home'));
+    setColor(S.categories[0] || 'anime');
+    updateHomeStatus();
+  },
+});
+$('catalogBtn').onclick = () => openCatalog(S.categories[0]);
 $('quitBtn').onclick = quitGame;
 $('pauseBtn').onclick = () => setPaused(!G.paused);
 $('skipBtn').onclick = skip;
