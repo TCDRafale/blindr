@@ -458,7 +458,7 @@ async function runRound() {
 
   videos.forEach(v => v.classList.toggle('active', v === el));
   prepareReveal(q);
-  markPlayed(q.key, q.work);
+  markPlayed(q.key, q.work, q.songKey);
   G.round++;
   $('roundLabel').textContent = `Manche ${G.round}`;
   G.elapsed = 0;

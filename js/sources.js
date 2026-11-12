@@ -56,9 +56,9 @@ export function workKey(name) {
   return k.trim();
 }
 
-export function markPlayed(key, work = '') {
-  recent.delete(key);
-  recent.add(key);
+// songKey : même chanson sous un autre identifiant Deezer (remaster, compilation, autre playlist).
+export function markPlayed(key, work = '', songKey = '') {
+  for (const k of [key, songKey]) { if (!k) continue; recent.delete(k); recent.add(k); }
   while (recent.size > RECENT_MAX) recent.delete(recent.values().next().value);
   save(RECENT_KEY, [...recent]);
   recentWorks = [...recentWorks, work || ''].slice(-WORK_GAP);
@@ -80,6 +80,7 @@ export function cleanShowTitle(t) {
     .replace(/^g[ée]n[ée]rique\s+(de\s+|du\s+|des\s+)?/i, '')
     .replace(/^th[èe]me\s+(de\s+|du\s+|des\s+|from\s+)?/i, '')
     .replace(/\s*[\(\[][^\)\]]*[\)\]]\s*$/, '') // « La petite maison dans la prairie (Little House On the Prairie) »
+    .replace(/\s+[-–]\s+(part|partie|pt\.?|vol\.?|volume)\s*\w+$/i, '') // « Game of Thrones - Part 1 »
     .replace(/\s*[-–:]?\s*(main titles?|main theme|theme song|opening theme|opening|theme|g[ée]n[ée]rique( de fin| original)?|intro)\s*$/i, '')
     .replace(/[:\-–,\s]+$/, '')
     .trim() || t;
@@ -148,22 +149,33 @@ async function fetchPlaylist(pid, withWork) {
   }
 }
 
+// Une œuvre n'appartient qu'à une catégorie : un titre présent dans plusieurs playlists revient à la plus précise
+// (un opening d'anime n'est pas un dessin animé, « Aladdin » est un Disney avant d'être un film).
+const OWNER_ORDER = ['anime', 'disney', 'cartoons', 'series', 'films', 'games'];
+
 export function loadPool(catId) {
   if (pools[catId]) return Promise.resolve(pools[catId]);
   if (poolLoading[catId]) return poolLoading[catId];
-  const cached = load(`blindr.pool3.${catId}`, null);
+  const cached = load(`blindr.pool4.${catId}`, null);
   if (cached && Date.now() - cached.ts < POOL_TTL && cached.items.length > 20) {
     pools[catId] = cached.items;
     return Promise.resolve(cached.items);
   }
   const cat = CAT_BY_ID[catId];
-  poolLoading[catId] = Promise.all(cat.playlists.map(pid => fetchPlaylist(pid, cat.work))).then(lists => {
+  const owners = OWNER_ORDER.slice(0, Math.max(0, OWNER_ORDER.indexOf(catId)));
+  poolLoading[catId] = Promise.all([
+    Promise.all(cat.playlists.map(pid => fetchPlaylist(pid, cat.work))),
+    Promise.all(owners.map(id => loadPool(id).catch(() => []))),
+  ]).then(([lists, higher]) => {
+    const takenIds = new Set(), takenWorks = new Set();
+    higher.flat().forEach(t => { takenIds.add(t.id); if (t.w) takenWorks.add(t.w); });
     const seen = new Map();
-    lists.flat().forEach(t => seen.set(t.id, t));
+    lists.flat().forEach(t => { if (!takenIds.has(t.id) && !(t.w && takenWorks.has(t.w))) seen.set(t.id, t); });
     const items = [...seen.values()].sort((a, b) => b.r - a.r);
+    items.forEach((t, i) => (t.p = Math.round(1000 * i / items.length) / 1000)); // rang Deezer, 0 = le plus écouté
     if (items.length) {
       pools[catId] = items;
-      save(`blindr.pool3.${catId}`, { ts: Date.now(), items });
+      save(`blindr.pool4.${catId}`, { ts: Date.now(), items });
     }
     delete poolLoading[catId];
     return items;
@@ -177,19 +189,162 @@ function slice(items, difficulty) {
   return s.length ? s : items;
 }
 
+function sliceRange(items, [a, b]) {
+  const s = items.slice(Math.floor(items.length * a), Math.ceil(items.length * b));
+  return s.length ? s : items;
+}
+
+// ---------- Notoriété des œuvres ----------
+// Mesurée par les vues de la page Wikipédia française (moyenne quotidienne sur 60 jours) : reflète ce qui est
+// connu en France (« Hélène et les garçons », « Les Mystérieuses Cités d'or »), contrairement à la popularité
+// internationale ou aux écoutes de la BO sur Deezer.
+const POP_CATS = new Set(['films', 'series', 'disney', 'cartoons']);
+const PRIOR_RANGE = { easy: [0, 0.7], medium: [0, 0.9], hard: [0.15, 1], all: [0, 1] };
+// Œuvres d'autres catégories, repérées par leur description Wikipédia.
+const ANIM_DESC = /\banimation\b|dessins? animes?|serie animee|\bcartoon/;
+const OWNED_ELSEWHERE = {
+  films: d => /disney|pixar/.test(d) && ANIM_DESC.test(d),       // classique d'animation Disney
+  series: d => ANIM_DESC.test(d),                                // série animée → Dessins animés
+  cartoons: d => /disney/.test(d),                               // série Disney → Disney
+};
+// Type attendu de la page Wikipédia (évite « Saturday Night Fever (album) » pour le film).
+const POP_TYPE = {
+  films: /\bfilms?\b/, disney: /\bfilms?\b|animation/, series: /serie|feuilleton|sitcom|telenovela/, cartoons: /anim|dessin/,
+};
+const NOT_WORK = /homonymie|\balbum\b|chanson|single|personnage|franchise|bande originale/;
+
+// Requêtes Wikimedia espacées, avec une pause de 2 min si le serveur demande de ralentir.
+let wikiNext = 0, wikiPauseUntil = 0;
+async function wikiFetch(url) {
+  if (Date.now() < wikiPauseUntil) throw new Error('wikimedia en pause');
+  const wait = Math.max(0, wikiNext - Date.now());
+  wikiNext = Date.now() + wait + 350;
+  if (wait) await new Promise(r => setTimeout(r, wait));
+  const r = await fetch(url).catch(() => null);
+  if (!r || !r.ok) {
+    if (!r || r.status === 429 || r.status >= 500) wikiPauseUntil = Date.now() + 120000;
+    throw new Error('wikimedia ' + (r?.status || 'network'));
+  }
+  try { return await r.json(); } catch { wikiPauseUntil = Date.now() + 120000; throw new Error('wikimedia ralenti'); }
+}
+
+// Dessins animés : un anime assez populaire pour sortir dans la catégorie Anime (Dragon Ball Z) n'y est pas repris.
+// Les anime plus confidentiels (Goldorak, Bouba, Capitaine Flam) restent des dessins animés.
+const ANIME_MIN_POP = 75000; // popularité AniList du dernier anime de la catégorie Anime (page 20)
+const AL_KEY = 'blindr.al';
+const alCache = load(AL_KEY, {});
+async function inAnimeCategory(name) {
+  const key = norm(name);
+  if (!key) return false;
+  if (key in alCache) return alCache[key];
+  // Recherche avec et sans accents (« Pokémon » ne trouve qu'un spin-off, « Pokemon » trouve la série).
+  const plainName = name.normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const fields = 'perPage:1){media(type:ANIME,search:';
+  const query = 'query($a:String,$b:String){a:Page(' + fields + '$a){popularity countryOfOrigin}} b:Page(' + fields + '$b){popularity countryOfOrigin}}}';
+  const r = await fetch('https://graphql.anilist.co', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ query, variables: { a: name, b: plainName } }),
+  });
+  if (!r.ok) throw new Error('anilist ' + r.status);
+  const d = (await r.json()).data || {};
+  const hits = [d.a?.media?.[0], d.b?.media?.[0]].filter(m => m && m.countryOfOrigin === 'JP');
+  alCache[key] = hits.some(m => m.popularity >= ANIME_MIN_POP);
+  save(AL_KEY, alCache);
+  return alCache[key];
+}
+// Repères de départ (vues/jour, triées) tant que l'app n'a pas mesuré assez d'œuvres de la catégorie.
+// Mesurés sur un échantillon des playlists (novembre 2026).
+const POP_REF = {
+  films:    [600, 400, 300, 240, 210, 180, 155, 135, 120, 105, 90, 75, 60, 48, 36, 26, 18, 12, 7, 3],
+  disney:   [500, 350, 280, 240, 200, 170, 145, 125, 105, 90, 75, 62, 50, 40, 31, 23, 16, 10, 6, 2],
+  series:   [700, 450, 330, 260, 210, 175, 145, 120, 100, 85, 70, 57, 46, 37, 29, 22, 15, 10, 6, 2],
+  cartoons: [350, 200, 140, 105, 85, 70, 58, 48, 40, 34, 28, 23, 19, 15, 12, 9, 7, 5, 3, 1],
+};
+const POP_KEY = 'blindr.pop';
+const popStore = load(POP_KEY, { id: {}, cat: {} });
+const popById = popStore.id;          // id Deezer -> vues/jour (null si inconnue)
+function rememberPop(id, v) {
+  popById[id] = v;
+  const ids = Object.keys(popById);
+  if (ids.length > 4000) ids.slice(0, ids.length - 4000).forEach(k => delete popById[k]);
+  save(POP_KEY, popStore);
+}
+// Rang de notoriété dans la catégorie : 0 = la plus connue, 1 = la moins connue.
+function popRank(catId, v) {
+  const seen = Object.values(popStore.cat[catId] || {}).filter(x => x != null);
+  const ref = seen.length >= 40 ? seen : [...seen, ...POP_REF[catId]];
+  return ref.filter(x => x > v).length / ref.length;
+}
+function inBand(catId, v, difficulty, deezerPos = 0.5) {
+  if (difficulty === 'all') return true;
+  const [a, b] = DIFFICULTY_RANGE[difficulty] || DIFFICULTY_RANGE.all;
+  const r = v == null ? deezerPos : popRank(catId, v); // œuvre introuvable : on se fie au rang Deezer
+  return r >= a && r <= b;
+}
+
+const INFO_KEY = 'blindr.info';
+const infoCache = load(INFO_KEY, {});
+// Page Wikipédia française de l'œuvre : vues, description et image, en une seule requête.
+async function workInfo(catId, name) {
+  const key = `${catId}:${norm(name)}`;
+  if (!norm(name)) return null;
+  if (key in infoCache) return infoCache[key];
+  const u = 'https://fr.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1' +
+    `&generator=search&gsrlimit=4&gsrsearch=${encodeURIComponent(`${name} ${WIKI_HINT[catId] || ''}`)}` +
+    '&prop=pageviews|description|pageimages&pvipdays=60&piprop=thumbnail&pithumbsize=1000';
+  const d = await wikiFetch(u);
+  const pages = Object.values(d.query?.pages || {}).sort((x, y) => x.index - y.index)
+    .filter(p => !NOT_WORK.test(norm(p.description || '')));
+  const named = p => sameName(p.title, name) || norm(p.title).startsWith(norm(name));
+  const typed = p => POP_TYPE[catId].test(norm(p.description || ''));
+  // La page porte le nom de l'œuvre et en a le type ; sinon, un des deux premiers résultats du bon type
+  // (titre français : « Saturday Night Fever » → « La Fièvre du samedi soir »).
+  // Séries et dessins animés : le titre est déjà le nom de l'œuvre, on exige donc la correspondance.
+  const loose = catId === 'films' || catId === 'disney';
+  const page = pages.find(p => named(p) && typed(p)) || (loose && pages.slice(0, 2).find(typed)) ||
+    pages.find(p => named(p) && !p.description);
+  let info = null;
+  if (page) {
+    const days = Object.values(page.pageviews || {}).filter(x => x != null);
+    info = {
+      v: days.length ? Math.round(days.reduce((a, x) => a + x, 0) / days.length) : null,
+      d: norm(page.description || ''),
+      img: page.thumbnail?.source || null,
+    };
+    if (info.v != null) {
+      const bucket = (popStore.cat[catId] ||= {});
+      bucket[workKey(name)] = info.v;
+      save(POP_KEY, popStore);
+    }
+  }
+  infoCache[key] = info;
+  const keys = Object.keys(infoCache);
+  if (keys.length > 3000) keys.slice(0, keys.length - 3000).forEach(k => delete infoCache[k]);
+  save(INFO_KEY, infoCache);
+  return info;
+}
+
 const validImg = url => url && !/\/images\/(artist|cover)\/\//.test(url);
 
 async function deezerQuestion(catId, difficulty) {
   const items = await loadPool(catId);
   if (!items.length) throw new Error('pool vide');
   const usable = items.filter(t => !rejected.has(t.id));
-  const range = slice(usable.length ? usable : items, difficulty);
   const cat = CAT_BY_ID[catId];
-  for (let attempt = 0; attempt < 12; attempt++) {
+  const byPop = POP_CATS.has(catId) && difficulty !== 'all';
+  // Films, séries, Disney, dessins animés : la difficulté vient de la notoriété de l'œuvre. Le rang Deezer
+  // ne sert qu'à dégrossir (une BO très écoutée est plus souvent celle d'une œuvre connue).
+  const range = byPop ? sliceRange(usable.length ? usable : items, PRIOR_RANGE[difficulty])
+    : slice(usable.length ? usable : items, difficulty);
+  let fallback = null;
+  for (let attempt = 0; attempt < (byPop ? 20 : 12); attempt++) {
     let candidate;
     for (let i = 0; i < 40; i++) {
       candidate = pick(range);
-      if (!recent.has(`dz:${candidate.id}`) && !isRecentWork(candidate.w)) break;
+      if (recent.has(`dz:${candidate.id}`) || isRecentWork(candidate.w)) continue;
+      // Notoriété déjà connue et hors du niveau choisi : on passe sans rien télécharger.
+      if (byPop && candidate.id in popById && !inBand(catId, popById[candidate.id], difficulty, candidate.p)) continue;
+      break;
     }
     // On recharge le morceau pour obtenir un lien d'extrait frais (ils expirent vite).
     let t;
@@ -217,13 +372,26 @@ async function deezerQuestion(catId, difficulty) {
     }
     const wk = cat.work ? workKey(title) : '';
     if (isRecentWork(wk)) continue; // même œuvre jouée il y a moins de 100 extraits
+    const songKey = cat.work ? '' : `s:${norm(artist.split(/,|&| feat/i)[0])}|${norm(song)}`;
+    if (songKey && recent.has(songKey)) continue; // même chanson, autre version
+    let info = null;
+    if (POP_CATS.has(catId)) {
+      info = await workInfo(catId, title).catch(() => undefined);
+      // Œuvre qui appartient à une autre catégorie (Disney, anime, dessin animé).
+      if (info && OWNED_ELSEWHERE[catId]?.(info.d)) { reject(t.id); continue; }
+      if (info !== undefined) rememberPop(t.id, info?.v ?? null);
+    }
+    if (catId === 'cartoons' && await inAnimeCategory(title).catch(() => false)) { reject(t.id); continue; }
     const showArtist = artist && !GENERIC_ARTIST.test(artist);
     const year = (t.album?.release_date || t.release_date || '').slice(0, 4);
     const cover = validImg(t.album?.cover_xl) ? t.album.cover_xl : null;
     const artistPic = validImg(t.artist?.picture_xl) && !cat.work ? t.artist.picture_xl : null;
-    return {
+    const q = {
       key: `dz:${t.id}`,
       work: wk,
+      songKey,
+      pop: info?.v ?? null,
+      image: info?.img || null,
       // Pochette de compilation (« 70 Génériques TV »…) plutôt que celle de l'œuvre : on cherchera une vraie image.
       genericCover: !!cat.work && catId !== 'anime' && !norm(cleanWork(album)).includes(wk || norm(title)),
       cat: catId,
@@ -241,7 +409,10 @@ async function deezerQuestion(catId, difficulty) {
       // Ce qu'on cherchera pour la vidéo de fond (œuvre pour les BO, sinon le morceau).
       search: cat.work ? title : null,
     };
+    if (!byPop || inBand(catId, q.pop, difficulty, candidate.p)) return q;
+    fallback = fallback || q; // hors niveau : gardé en secours si rien de mieux n'est trouvé
   }
+  if (fallback) return fallback;
   throw new Error('aucun extrait disponible');
 }
 
@@ -384,11 +555,11 @@ async function wikidataEntities(name) {
   if (!key) return [];
   if (wdCache[key]) return wdCache[key];
   const api = 'https://www.wikidata.org/w/api.php?format=json&origin=*';
-  const s = await fetch(`${api}&action=wbsearchentities&language=fr&uselang=fr&type=item&limit=7&search=${encodeURIComponent(name)}`).then(r => r.json());
+  const s = await wikiFetch(`${api}&action=wbsearchentities&language=fr&uselang=fr&type=item&limit=7&search=${encodeURIComponent(name)}`);
   const ids = (s.search || []).map(x => x.id);
   let ents = [];
   if (ids.length) {
-    const e = await fetch(`${api}&action=wbgetentities&props=claims|descriptions|labels&languages=fr|en&ids=${ids.join('|')}`).then(r => r.json());
+    const e = await wikiFetch(`${api}&action=wbgetentities&props=claims|descriptions|labels&languages=fr|en&ids=${ids.join('|')}`);
     ents = ids.map(id => e.entities?.[id]).filter(Boolean).map(ent => ({
       l: ent.labels?.fr?.value || ent.labels?.en?.value || '',
       d: norm(ent.descriptions?.fr?.value || ent.descriptions?.en?.value || ''),
@@ -483,7 +654,10 @@ export async function checkWork(catId, album, song, artist = '') {
     }
     // Séries : Wikidata d'abord (TVmaze a des homonymes, comme une émission « Tetris »).
     const ents = await wikidataEntities(name);
-    if (ents.some(e => (SERIES_RE.test(e.d) || ANIMATED_RE.test(e.d)) && sameName(e.l, name))) return true;
+    // Série animée : elle appartient aux Dessins animés.
+    const hit = ents.find(e => (SERIES_RE.test(e.d) || ANIMATED_RE.test(e.d)) && sameName(e.l, name));
+    if (hit) return !ANIMATED_RE.test(hit.d);
+    if (tv?.t === 'Animation') return false;
     if (ents.some(e => MUSIC_RE.test(e.d) && sameName(e.l, name))) return false; // une chanson (« Je m'appelle Hélène »)
     if (tv) return true; // série connue de TVmaze (« Batman » 1966)
     if (ents.some(e => /\bfilm\b|jeu video|video game/.test(e.d) && sameName(e.l, name))) return false; // un film ou un jeu (« Tetris »)
@@ -512,7 +686,7 @@ async function tvmazeImage(name) {
 async function wikiImage(lang, query) {
   const u = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=1` +
     `&gsrsearch=${encodeURIComponent(query)}&prop=pageimages&piprop=thumbnail&pithumbsize=1000`;
-  const d = await fetch(u).then(r => r.json());
+  const d = await wikiFetch(u);
   const page = Object.values(d.query?.pages || {})[0];
   return page?.thumbnail?.source || null;
 }
@@ -527,7 +701,7 @@ export async function findImage(q) {
   let img = null;
   try {
     if (q.cat === 'series' || q.cat === 'cartoons') img = await tvmazeImage(q.title);
-    if (!img) img = await wikiImage('fr', `${q.title} ${WIKI_HINT[q.cat] || ''}`);
+    if (!img) img = q.image || await wikiImage('fr', `${q.title} ${WIKI_HINT[q.cat] || ''}`);
     if (!img) img = await wikiImage('en', `${q.title} ${q.cat === 'games' ? 'video game' : q.cat === 'series' ? 'TV series' : 'film'}`);
   } catch {
     return null; // erreur réseau : on ne mémorise pas

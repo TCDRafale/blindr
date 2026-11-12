@@ -4,6 +4,8 @@ Blind test infini pour iPhone, sous forme de web app (PWA) : pas de compilation,
 
 ## Contenu généré automatiquement
 - **Musique, films, séries, Disney, dessins animés, jeux vidéo** : extraits de 30 s tirés de playlists Deezer (API publique, sans clé). La popularité Deezer sert à régler la difficulté.
+- **Difficulté** : pour la musique et les jeux, popularité Deezer du morceau. Pour les films, séries, Disney et dessins animés, notoriété de l'œuvre en France (vues de sa page Wikipédia française), avec repli sur Deezer si Wikipédia ne répond pas.
+- **Une œuvre, une catégorie** : un titre présent dans plusieurs catégories est rangé dans la plus précise (Anime > Disney > Dessins animés > Séries > Films). Un anime assez populaire pour sortir en Anime n'apparaît pas en Dessins animés.
 - **Anime** : les openings et endings officiels en vidéo (AnimeThemes), choisis parmi les anime les plus populaires d'AniList. Si la vidéo ne passe pas, l'app se rabat sur des playlists Deezer d'anime.
 
 - **Vidéo de fond à la révélation** (muette) : extrait du clip officiel (Apple) pour la musique, bande-annonce YouTube référencée par Wikidata pour les films, séries, Disney et jeux. Sans vidéo trouvée, la pochette animée s'affiche.
