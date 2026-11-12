@@ -118,8 +118,8 @@ const DISNEY = ['Q7414', 'Q191224', 'Q1047410', 'Q127552', 'Q2081339', 'Q178837'
 
 // Recherche des noms par lots via SPARQL (service EntitySearch) : l'API de recherche classique limite très vite
 // le débit, pas le point d'accès SPARQL. Résultat par nom : [{ id, l (libellé fr), m (libellé en), d (description) }].
-async function searchAll(names) {
-  const c = cache('search');
+async function searchAll(names, store = 'search', limit = 7) {
+  const c = cache(store);
   const todo = [...new Set(names)].filter(n => !(norm(n) in c.data));
   const lit = n => '"' + n.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ') + '"';
   for (let i = 0; i < todo.length; i += 40) {
@@ -129,7 +129,7 @@ async function searchAll(names) {
       VALUES ?name { ${batch.map(lit).join(' ')} }
       SERVICE wikibase:mwapi { bd:serviceParam wikibase:endpoint "www.wikidata.org"; wikibase:api "EntitySearch";
         mwapi:search ?name; mwapi:language "fr". ?item wikibase:apiOutputItem mwapi:item. ?num wikibase:apiOrdinal true. }
-      FILTER(?num < 7)
+      FILTER(?num < ${limit})
       OPTIONAL { ?item rdfs:label ?lfr FILTER(lang(?lfr) = 'fr') }
       OPTIONAL { ?item rdfs:label ?len FILTER(lang(?len) = 'en') }
       OPTIONAL { ?item schema:description ?dfr FILTER(lang(?dfr) = 'fr') }
@@ -255,13 +255,15 @@ function categoryOf(e, srcCats) {
 function candidates(t, srcCats) {
   const title = t.t || '';
   const out = [];
-  const add = (n, kind) => { n = (n || '').trim(); if (n.length > 1 && !out.some(x => norm(x.n) === norm(n))) out.push({ n, kind }); };
+  const add = (n, kind) => { n = (n || '').replace(/:(?=\S)/g, ': ').trim(); if (n.length > 1 && !out.some(x => norm(x.n) === norm(n))) out.push({ n, kind }); };
   const fw = findWork(title, t.al);
   if (fw) add(fw, /from|theme|soundtrack|ost|bande/i.test(title) ? 'from' : 'album');
   const albumW = t.al && !COMPIL_RE.test(t.al) ? cleanWork(t.al) : '';
   const titleW = cleanShowTitle(cleanTitle(title));
   const showLike = ['series', 'cartoons', 'anime', 'tv'].some(c => srcCats.has(c));
-  if (showLike) { add(titleW, 'title'); if (norm(albumW) !== norm(title)) add(albumW, 'album'); }
+  // « Goldorak : La légende d'Actarus », « Capitaine Flam: La chevauchée… » : l'œuvre est avant les deux-points.
+  const beforeColon = s => (s.match(/^([^:]{2,}?)\s*:\s*\S/) || [])[1] || '';
+  if (showLike) { add(titleW, 'title'); add(beforeColon(titleW), 'title'); add(beforeColon(albumW || ''), 'album'); if (norm(albumW) !== norm(title)) add(albumW, 'album'); }
   else { if (norm(albumW) !== norm(title)) add(albumW, 'album'); add(titleW, 'title'); }
   return out;
 }
@@ -269,16 +271,19 @@ function candidates(t, srcCats) {
 // Libellés de la recherche, complétés par ceux de l'étape des types (la recherche en renvoie parfois de vides).
 let ENTS = {};
 const frTitle = e => (e?.fr || '').replace(/\s*\([^)]*\)\s*$/, '');
-const labelMatches = (r, name) => [r.l, r.m, ENTS[r.id]?.lfr, ENTS[r.id]?.len, ENTS[r.id]?.lmul, frTitle(ENTS[r.id])].some(x => x && (sameName(x, name) || norm(x) === norm(name)));
+// « Silver Hawks » = « SilverHawks », « Assassin's Creed 3 » = « Assassin's Creed III ».
+const ROMAN = { ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10, xi: 11, xii: 12, xiii: 13, xiv: 14, xv: 15, xvi: 16 };
+const squash = s => norm(s).replace(/(?<=\S) (ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii|xiii|xiv|xv|xvi)\b/g, (_, r) => ' ' + ROMAN[r]).replace(/ /g, '');
+const labelMatches = (r, name) => [r.l, r.m, ENTS[r.id]?.lfr, ENTS[r.id]?.len, ENTS[r.id]?.lmul, frTitle(ENTS[r.id])].some(x => x && (sameName(x, name) || squash(x) === squash(name)));
 
 // Choisit l'entité d'un nom. Renvoie { id } ou { why } (raison du rejet).
-function pick(results, name, kind, artist, ents, srcCats, album = '') {
+function pick(results, name, kind, artist, ents, srcCats, album = '', title = '') {
   const matched = results.filter(r => labelMatches(r, name) && ents[r.id]);
   if (!matched.length) return { why: 'œuvre introuvable sur Wikidata' };
   const E = r => ents[r.id];
   const who = norm(artist);
   // Album de l'artiste lui-même (« Nevermind » de Nirvana) : ce n'est pas une BO.
-  if (who.length > 2 && matched.some(r => has(E(r), 'album') && !isWorkEntity(E(r)) && norm(r.d).includes(who))) {
+  if (who.length > 2 && !SOUNDTRACK_RE.test(album) && matched.some(r => has(E(r), 'album') && !isWorkEntity(E(r)) && norm(r.d).includes(who))) {
     return { why: `album de ${artist}, pas une œuvre` };
   }
   const showSrc = SHOW_SRC.some(c => srcCats.has(c));
@@ -323,13 +328,30 @@ function pick(results, name, kind, artist, ents, srcCats, album = '') {
     // ne passe pas avant (« La Bamba », « Hallelujah », « Happy Together »).
     const musicFirst = matched.findIndex(r => isMusicEntity(E(r)));
     const workIdx = matched.findIndex(r => r.id === best.id);
-    if (musicFirst >= 0 && musicFirst < workIdx) return { why: 'titre de chanson, pas une œuvre' };
-    if (showSrc && showType(be)) return { id: best.id };
+    // Chanson-titre d'un film connu (« No Time To Die », « Footloose », « Pretty Woman ») dans une playlist de films.
+    if (!showSrc && filmType(be) && (be.sl || 0) >= 30) return { id: best.id };
+    // Playlist de génériques : une série du même nom que le titre est l'œuvre si le morceau ressemble à un générique
+    // (« Lady Oscar » sur une compilation de génériques), ou si elle est de la catégorie de la playlist et qu'aucune
+    // chanson du même nom ne passe avant (« My Dearest » d'une playlist d'anime n'est pas une série).
+    const themeish = THEME_RE.test(title) || GENERIC_ARTIST.test(artist) || COVER_RE.test(artist)
+      || /g[ée]n[ée]rique|\btv\b|t[ée]l[ée]|dessins? anim|cartoon|s[ée]ries|\btheme/i.test(`${album} ${artist}`);
+    const songFirst = musicFirst >= 0 && musicFirst < workIdx;
+    if (showSrc && showType(be) && (themeish || (srcCats.has(categoryOf(be, srcCats)) && !songFirst))) return { id: best.id };
+    if (songFirst) return { why: 'titre de chanson, pas une œuvre' };
     if (music) return { why: 'titre de chanson, pas une œuvre' };
     if (showSrc && !has(be, 'animFilm', 'animeFilm', 'game')) return { why: 'titre de chanson, pas une œuvre' };
     if (!showSrc && matched[0].id !== best.id) return { why: 'titre de chanson, pas une œuvre' };
   }
   return { id: best.id };
+}
+
+// Œuvre nommée par une correction : la plus connue des entités de ce nom qui tombe dans la catégorie voulue.
+function resolveNamed(results, name, cat, ents) {
+  const ok = results.filter(r => labelMatches(r, name) && ents[r.id] && isWorkEntity(ents[r.id]) && categoryOf(ents[r.id], new Set([cat])) === cat);
+  if (ok.length) return ok.sort((a, b) => (ents[b.id].sl || 0) - (ents[a.id].sl || 0))[0].id;
+  // Sinon l'œuvre la plus connue de ce nom (Wikidata la classe parfois autrement : coproduction franco-japonaise…).
+  const any = results.filter(r => labelMatches(r, name) && ents[r.id] && isWorkEntity(ents[r.id]));
+  return any.sort((a, b) => (ents[b.id].sl || 0) - (ents[a.id].sl || 0))[0]?.id || null;
 }
 
 // ---------- 2 bis. Œuvres connues absentes des playlists ----------
@@ -360,16 +382,22 @@ async function deezerSearch(q) {
 }
 // Thème d'une œuvre sur Deezer : l'album ou le titre doit nommer l'œuvre, et ressembler à une BO ou un générique.
 async function findTheme(e, cat) {
-  const names = [...new Set([e.lfr, e.fr && e.fr.replace(/\s*\([^)]*\)\s*$/, ''), e.len].filter(n => n && norm(n).length >= 3))];
+  const fr = [e.lfr, e.fr && e.fr.replace(/\s*\([^)]*\)\s*$/, '')].find(n => n && norm(n).length >= 3);
+  const en = [e.len, e.lmul].find(n => n && norm(n).length >= 3);
+  const names = [...new Set([fr, en].filter(Boolean))];
   const show = ['series', 'cartoons', 'tv'].includes(cat);
-  const queries = names.slice(0, 2).flatMap(n => show ? [`générique ${n}`, `${n} theme`] : [`${n} bande originale`, `${n} soundtrack`]);
+  const queries = show ? [...names.flatMap(n => [`générique ${n}`, `${n} theme`]), en && `${en} soundtrack`].filter(Boolean)
+    : [en && `${en} soundtrack`, fr && `${fr} bande originale`].filter(Boolean);
   const found = new Map();
   for (const q of queries) {
     for (const t of await deezerSearch(q)) {
-      const text = norm(`${t.al} ${t.t}`);
-      const named = names.some(n => text.includes(norm(n)) && (norm(t.al).includes(norm(n)) || norm(t.t).includes(norm(n))));
-      const looks = SOUNDTRACK_RE.test(t.al) || THEME_RE.test(t.t) || (show && names.some(n => norm(cleanShowTitle(cleanTitle(t.t))) === norm(n)));
-      if (named && looks && !COMPIL_RE.test(t.al)) found.set(t.id, t);
+      // L'œuvre nommée par le morceau ou son album doit être exactement celle-ci (pas « Seven Seas » pour « Seven »,
+      // ni « Gravity Falls » pour « Gravity »), et l'album une BO (pas celle d'un jeu pour un film).
+      const exact = x => x && names.some(n => norm(x).replace(/^(the|le|la|les|l) /, '') === norm(n).replace(/^(the|le|la|les|l) /, ''));
+      const fromAlbum = SOUNDTRACK_RE.test(t.al) && exact(cleanWork(t.al));
+      const fromTitle = exact(findWork(t.t, '')) || (THEME_RE.test(t.t) || show) && exact(cleanShowTitle(cleanTitle(t.t)));
+      const gameAlbum = cat !== 'games' && /video ?game|game (sound|music)|\bgame\b/i.test(t.al);
+      if ((fromAlbum || fromTitle) && !gameAlbum && !COMPIL_RE.test(t.al)) found.set(t.id, t);
     }
     if (found.size >= 3) break;
   }
@@ -411,7 +439,7 @@ async function pageInfo(titles) {
 
 // ---------- Règles propres au blind test ----------
 // Réenregistrements de compilations : gardés seulement si l'original manque.
-const COVER_RE = /geek music|theme fantasy|coded channel|piano lover|imperial orchestra|video game players|tv theme|the tv theme players|musique de film|les petits loups|tv generation|g[ée]n[ée]riques? de s[ée]ries|compilation g[ée]n[ée]rique|g[ée]n[ée]ration tv|top tv|kitsch and camp|tv toons|hit crew|edwin davids|south bay groovy|fx costello|club des juniors|orchestra cinematique|l'orchestra|tv themes|tv sounds|movie sounds unlimited|london music works|the soundtrack studio stars|film score orchestra|starlight orchestra|tribute|henri garella|crypt|towenda|prime time|hollywood'?s? martins|soundtrack wonder band|cinematic orchestra|générique tv|generique tv/i;
+const COVER_RE = /geek music|theme fantasy|coded channel|piano lover|imperial orchestra|video game players|tv theme|the tv theme players|musique de film|les petits loups|tv generation|g[ée]n[ée]riques? de s[ée]ries|compilation g[ée]n[ée]rique|g[ée]n[ée]ration tv|top tv|kitsch and camp|tv toons|hit crew|edwin davids|south bay groovy|fx costello|club des juniors|orchestra cinematique|l'orchestra|tv themes|tv sounds|movie sounds unlimited|london music works|the soundtrack studio stars|film score orchestra|starlight orchestra|tribute|henri garella|crypt|towenda|prime time|hollywood'?s? martins|soundtrack wonder band|cinematic orchestra|générique tv|generique tv|henrick garell|brian springstill|franck aravya|santana aria/i;
 const THEME_RE = /g[ée]n[ée]rique|main (title|theme)|theme song|opening|\btheme\b|th[èe]me/i;
 const isCover = t => COVER_RE.test(t.a) || GENERIC_ARTIST.test(t.a);
 
@@ -448,12 +476,27 @@ async function main() {
 
   console.log('2/5 Œuvres (Wikidata)');
   const cands = new Map(workTracks.map(t => [t.id, candidates(t, t.src)]));
-  const names = [...new Set([...cands.values()].flat().map(c => c.n))];
+  // Corrections qui nomment l'œuvre : le nom est cherché comme les autres pour retrouver son entité.
+  const ovNames = Object.values(trackOv).map(o => o.work).filter(w => w && !/^Q\d+$/.test(w));
+  const names = [...new Set([...[...cands.values()].flat().map(c => c.n), ...ovNames])];
   const forcedIds = Object.values(trackOv).map(o => o.work).filter(w => /^Q\d+$/.test(w || ''));
   await searchAll(names);
   saveCaches(true);
   const sc = cache('search').data;
-  const ents = await classify([...names.flatMap(n => (sc[norm(n)] || []).map(r => r.id)), ...forcedIds, ...Object.keys(workOv)]);
+  let ents = await classify([...names.flatMap(n => (sc[norm(n)] || []).map(r => r.id)), ...forcedIds, ...Object.keys(workOv)]);
+  ENTS = ents;
+  saveCaches(true);
+  // Les 7 premiers résultats ne contiennent parfois pas l'œuvre (« Titanic » : le paquebot, la comédie musicale…) :
+  // recherche plus profonde pour les noms sans œuvre correspondante.
+  const workMatches = n => (sc[norm(n)] || []).filter(r => labelMatches(r, n) && ents[r.id] && isWorkEntity(ents[r.id]));
+  await markExtra(names.flatMap(n => workMatches(n).map(r => r.id)), ents);
+  // Aussi quand la seule œuvre trouvée est obscure : « Top Gun » de 1955 avant celui de 1986.
+  const shallow = names.filter(n => (sc[norm(n)] || []).length >= 7 && (sc[norm(n)] || []).length < 25 && Math.max(0, ...workMatches(n).map(r => ents[r.id].sl || 0)) < 20);
+  console.log(`  Recherche approfondie : ${shallow.length} noms`);
+  await searchAll(shallow, 'deep', 25);
+  const deep = cache('deep').data;
+  for (const n of shallow) if (deep[norm(n)]?.length) sc[norm(n)] = deep[norm(n)];
+  ents = await classify(shallow.flatMap(n => (sc[norm(n)] || []).map(r => r.id)));
   ENTS = ents;
   saveCaches(true);
 
@@ -471,6 +514,7 @@ async function main() {
     if (ov?.out) { rejected.push({ t, why: 'exclu à la main' }); continue; }
     let id = null, why = 'œuvre introuvable';
     if (ov?.work && /^Q\d+$/.test(ov.work)) id = ov.work;
+    else if (ov?.work && (id = resolveNamed(sc[norm(ov.work)] || [], ov.work, ov.cat, ents))) { /* entité trouvée */ }
     else if (ov?.work) {
       const key = `${ov.cat}:${norm(ov.work)}`;
       if (!custom.has(key)) custom.set(key, { name: ov.work, cat: ov.cat, tracks: [] });
@@ -478,7 +522,7 @@ async function main() {
       continue;
     } else {
       for (const c of cands.get(t.id)) {
-        const r = pick(sc[norm(c.n)] || [], c.n, c.kind, t.a, ents, t.src, t.al);
+        const r = pick(sc[norm(c.n)] || [], c.n, c.kind, t.a, ents, t.src, t.al, t.t);
         if (r.id) { id = r.id; break; }
         why = r.why;
       }
@@ -498,6 +542,7 @@ async function main() {
   for (const sd of SEEDS) for (const id of await seedIds(sd)) seeds.push([sd.cat, id]);
   const seedEnts = await classify(seeds.map(([, id]) => id));
   let added = 0;
+  const seededIds = new Set();
   const missing = seeds.filter(([, id]) => !works.has(id) && !workOv[id]?.out);
   for (let i = 0; i < missing.length; i++) {
     progress('Thèmes Deezer', i, missing.length);
@@ -506,8 +551,10 @@ async function main() {
     const e = seedEnts[id];
     const cat = workOv[id]?.cat || categoryOf(e, new Set([seedCat]));
     if (!cat) continue;
-    const found = (await findTheme(e, cat)).filter(t => !trackOv[t.id]?.out);
+    // Seulement des morceaux nouveaux : ceux des playlists sont déjà rattachés (ou écartés, ou corrigés à la main).
+    const found = (await findTheme(e, cat)).filter(t => !trackOv[t.id] && !tracks.has(t.id) && !seededIds.has(t.id));
     if (!found.length) continue;
+    found.forEach(t => seededIds.add(t.id));
     works.set(id, { id, e, cat, tracks: found.map(t => ({ ...t, src: new Set([seedCat]) })), seeded: true });
     added++;
   }
@@ -575,11 +622,12 @@ async function main() {
     for (const cat of t.src) if (WORK_CATS.includes(cat)) byCat[cat].out.push({ ...trackOut(t), al: t.al, why });
   }
 
-  // Catégories musicales (et publicités) : une entrée par chanson, versions fusionnées.
+  // Catégories musicales : une entrée par chanson, versions fusionnées.
   for (const id of MUSIC_CATS) {
     const seen = new Map();
     for (const t of all.filter(x => x.src.has(id))) {
-      if (trackOv[t.id]?.out) { byCat[id].out.push({ ...trackOut(t), al: t.al, why: 'exclu à la main' }); continue; }
+      // Exclusion d'un titre musical : seulement si la correction vise cette catégorie (les autres concernent les œuvres).
+      if (trackOv[t.id]?.out && trackOv[t.id].cat === id) { byCat[id].out.push({ ...trackOut(t), al: t.al, why: 'exclu à la main' }); continue; }
       const k = norm(t.a.split(/,|&| feat/i)[0]) + '|' + norm(cleanTitle(t.ts || t.t));
       const prev = seen.get(k);
       if (!prev || t.r > prev.r) seen.set(k, t);
@@ -636,4 +684,6 @@ th{color:#999;font-weight:600}code{color:#888;font-size:11px}i{color:#999}summar
 <h1>Revue du catalogue</h1><p>Construit le ${built}.</p><nav>${CATEGORIES.map(c => `<a href="#${c.id}">${esc(c.label)}</a>`).join('')}</nav>${body}</body></html>`;
 }
 
-main().catch(e => { saveCaches(true); console.error(e); process.exit(1); });
+if (process.argv[1] === fileURLToPath(import.meta.url)) main().catch(e => { saveCaches(true); console.error(e); process.exit(1); });
+export { resolveNamed, candidates, pick, categoryOf, cache, has, isWorkEntity, isMusicEntity, labelMatches };
+export const setEnts = e => { ENTS = e; };

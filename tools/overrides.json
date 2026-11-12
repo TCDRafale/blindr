@@ -1,6 +1,3032 @@
 {
-  "_doc": "Corrections manuelles, prioritaires sur le tri automatique. tracks: par id Deezer → {out: true} pour exclure, {cat, work} pour forcer (work = Qid Wikidata ou nom libre), {name} pour renommer un titre musical. works: par Qid → {out, cat, name, level (0 facile, 1 moyen, 2 difficile)}. animeOut: ids AniList des anime à ne plus jouer en vidéo.",
-  "tracks": {},
-  "works": {},
-  "animeOut": []
+ "_doc": "Corrections manuelles, prioritaires sur le tri automatique. tracks: par id Deezer → {out: true} pour écarter des catégories d'œuvres, {out: true, cat} pour écarter d'une catégorie musicale, {cat, work} pour forcer (work = Qid Wikidata ou nom libre), {name} pour renommer un titre musical. works: par Qid → {out, cat, name, level (0 facile, 1 moyen, 2 difficile)}. animeOut: ids AniList des anime à ne plus jouer en vidéo.",
+ "tracks": {
+  "226101": {
+   "cat": "films",
+   "work": "Shaft"
+  },
+  "226104": {
+   "cat": "tv",
+   "work": "Ushuaïa Nature"
+  },
+  "308723": {
+   "cat": "films",
+   "work": "Beverly Hills Cop"
+  },
+  "308724": {
+   "cat": "films",
+   "work": "Bagdad Café"
+  },
+  "308725": {
+   "cat": "films",
+   "work": "The Good, the Bad and the Ugly"
+  },
+  "308726": {
+   "cat": "films",
+   "work": "Mon nom est Personne"
+  },
+  "308727": {
+   "cat": "films",
+   "work": "Once Upon a Time in the West"
+  },
+  "308728": {
+   "cat": "films",
+   "work": "The Big Blue"
+  },
+  "308729": {
+   "cat": "films",
+   "work": "James Bond"
+  },
+  "308730": {
+   "cat": "films",
+   "work": "Stand by Me"
+  },
+  "308731": {
+   "cat": "films",
+   "work": "Midnight Express"
+  },
+  "308732": {
+   "cat": "films",
+   "work": "Zorba the Greek"
+  },
+  "308733": {
+   "cat": "films",
+   "work": "The Rose"
+  },
+  "308734": {
+   "cat": "films",
+   "work": "Le Professionnel"
+  },
+  "308735": {
+   "cat": "films",
+   "work": "The Pink Panther"
+  },
+  "308736": {
+   "cat": "films",
+   "work": "Butch Cassidy and the Sundance Kid"
+  },
+  "308737": {
+   "cat": "films",
+   "work": "Chariots of Fire"
+  },
+  "308738": {
+   "cat": "films",
+   "work": "Lethal Weapon 3"
+  },
+  "308739": {
+   "cat": "films",
+   "work": "Borsalino"
+  },
+  "308740": {
+   "cat": "films",
+   "work": "Rocky"
+  },
+  "308741": {
+   "cat": "films",
+   "work": "Un homme et une femme"
+  },
+  "308742": {
+   "cat": "films",
+   "work": "Le Château de ma mère"
+  },
+  "308743": {
+   "cat": "films",
+   "work": "The Godfather"
+  },
+  "308744": {
+   "cat": "films",
+   "work": "The Terminator"
+  },
+  "308745": {
+   "cat": "films",
+   "work": "Jean de Florette"
+  },
+  "308746": {
+   "cat": "films",
+   "work": "The Bridge on the River Kwai"
+  },
+  "308747": {
+   "cat": "films",
+   "work": "Summer of '42"
+  },
+  "308748": {
+   "cat": "films",
+   "work": "La Gloire de mon père"
+  },
+  "308749": {
+   "cat": "films",
+   "work": "La Boum"
+  },
+  "308750": {
+   "cat": "films",
+   "work": "Le Clan des Siciliens"
+  },
+  "308751": {
+   "cat": "films",
+   "work": "Barry Lyndon"
+  },
+  "308752": {
+   "cat": "films",
+   "work": "The Full Monty"
+  },
+  "308753": {
+   "cat": "films",
+   "work": "Love Story"
+  },
+  "308755": {
+   "cat": "films",
+   "work": "Dirty Dancing"
+  },
+  "308756": {
+   "cat": "films",
+   "work": "Ghost"
+  },
+  "308759": {
+   "cat": "films",
+   "work": "The Magnificent Seven"
+  },
+  "308760": {
+   "cat": "films",
+   "work": "Blade Runner"
+  },
+  "308762": {
+   "cat": "films",
+   "work": "Sacco et Vanzetti"
+  },
+  "308763": {
+   "cat": "films",
+   "work": "Doctor Zhivago"
+  },
+  "308764": {
+   "cat": "films",
+   "work": "Autant en emporte le vent"
+  },
+  "308765": {
+   "cat": "films",
+   "work": "The Sting"
+  },
+  "308766": {
+   "cat": "films",
+   "work": "The Thomas Crown Affair"
+  },
+  "308769": {
+   "cat": "films",
+   "work": "High Noon"
+  },
+  "308770": {
+   "cat": "films",
+   "work": "Merry Christmas, Mr. Lawrence"
+  },
+  "308771": {
+   "cat": "films",
+   "work": "La Cage aux Folles"
+  },
+  "308772": {
+   "cat": "films",
+   "work": "New York, New York"
+  },
+  "308773": {
+   "cat": "films",
+   "work": "Lawrence of Arabia"
+  },
+  "308774": {
+   "cat": "films",
+   "work": "Singin' in the Rain"
+  },
+  "308775": {
+   "cat": "films",
+   "work": "West Side Story"
+  },
+  "308777": {
+   "cat": "films",
+   "work": "The Mission"
+  },
+  "308778": {
+   "cat": "films",
+   "work": "Cabaret"
+  },
+  "308779": {
+   "cat": "films",
+   "work": "Le Grand Blond avec une chaussure noire"
+  },
+  "308780": {
+   "cat": "films",
+   "work": "The Legend of 1900"
+  },
+  "308782": {
+   "cat": "films",
+   "work": "Against All Odds"
+  },
+  "308783": {
+   "cat": "films",
+   "work": "La Bamba"
+  },
+  "308784": {
+   "cat": "films",
+   "work": "The Blues Brothers"
+  },
+  "308785": {
+   "cat": "films",
+   "work": "Purple Rain"
+  },
+  "308787": {
+   "cat": "films",
+   "work": "Rocky IV"
+  },
+  "308788": {
+   "cat": "films",
+   "work": "The Blues Brothers"
+  },
+  "308789": {
+   "cat": "films",
+   "work": "The Bodyguard"
+  },
+  "308792": {
+   "cat": "films",
+   "work": "The Rose"
+  },
+  "308793": {
+   "cat": "films",
+   "work": "Ghost"
+  },
+  "308795": {
+   "cat": "films",
+   "work": "Dirty Dancing"
+  },
+  "308800": {
+   "cat": "anime",
+   "work": "Candy Candy"
+  },
+  "308809": {
+   "cat": "tv",
+   "work": "Intervilles"
+  },
+  "308811": {
+   "cat": "tv",
+   "work": "Ushuaïa Nature"
+  },
+  "540006": {
+   "cat": "films",
+   "work": "Moonrise Kingdom"
+  },
+  "678635": {
+   "cat": "films",
+   "work": "Le Seigneur des anneaux : Le Retour du roi"
+  },
+  "730428": {
+   "cat": "films",
+   "work": "Batman Forever"
+  },
+  "736732": {
+   "cat": "series",
+   "work": "The Wire"
+  },
+  "850087": {
+   "cat": "films",
+   "work": "Chicago"
+  },
+  "867183": {
+   "cat": "films",
+   "work": "A Walk to Remember"
+  },
+  "876484": {
+   "cat": "series",
+   "work": "Mannix"
+  },
+  "913484": {
+   "cat": "films",
+   "work": "Mamma Mia!"
+  },
+  "923186": {
+   "cat": "tv",
+   "work": "La Dernière Séance"
+  },
+  "983794": {
+   "cat": "films",
+   "work": "Natural Born Killers"
+  },
+  "1029782": {
+   "cat": "films",
+   "work": "Legends of the Fall"
+  },
+  "1030913": {
+   "cat": "films",
+   "work": "Q167726"
+  },
+  "1436655": {
+   "cat": "anime",
+   "work": "Saint Seiya"
+  },
+  "1436742": {
+   "cat": "anime",
+   "work": "Lady Georgie"
+  },
+  "1436830": {
+   "cat": "anime",
+   "work": "High School! Kimengumi"
+  },
+  "1436879": {
+   "cat": "anime",
+   "work": "Aim for the Ace!"
+  },
+  "1437020": {
+   "cat": "anime",
+   "work": "Saint Seiya"
+  },
+  "1437057": {
+   "cat": "series",
+   "work": "Hélène et les Garçons"
+  },
+  "1437096": {
+   "cat": "anime",
+   "work": "Maison Ikkoku"
+  },
+  "1437109": {
+   "cat": "anime",
+   "work": "Bioman"
+  },
+  "1437124": {
+   "cat": "cartoons",
+   "work": "Babar"
+  },
+  "1446849": {
+   "cat": "anime",
+   "work": "Tales of Little Women"
+  },
+  "1446850": {
+   "cat": "cartoons",
+   "work": "Care Bears"
+  },
+  "1446856": {
+   "cat": "anime",
+   "work": "Flo et les Robinson suisses"
+  },
+  "1446860": {
+   "cat": "anime",
+   "work": "Embrasse-moi Lucile"
+  },
+  "1564993": {
+   "cat": "films",
+   "work": "Shrek"
+  },
+  "1565012": {
+   "cat": "films",
+   "work": "Shrek"
+  },
+  "1908095": {
+   "cat": "tv",
+   "work": "Ushuaïa Nature"
+  },
+  "2043943": {
+   "out": true
+  },
+  "2228633": {
+   "cat": "films",
+   "work": "Cat People"
+  },
+  "2228680": {
+   "cat": "films",
+   "work": "Arrête-moi si tu peux"
+  },
+  "2271234": {
+   "cat": "tv",
+   "work": "Koh-Lanta"
+  },
+  "2408341": {
+   "cat": "tv",
+   "work": "Loft Story"
+  },
+  "2408346": {
+   "cat": "tv",
+   "work": "Loft Story"
+  },
+  "2408360": {
+   "out": true
+  },
+  "2408378": {
+   "out": true
+  },
+  "2485108": {
+   "out": true
+  },
+  "2575313": {
+   "cat": "disney",
+   "work": "Snow White and the Seven Dwarfs"
+  },
+  "2659940": {
+   "out": true
+  },
+  "2860241": {
+   "cat": "tv",
+   "work": "Intervilles"
+  },
+  "3026450": {
+   "out": true
+  },
+  "3041345": {
+   "cat": "films",
+   "work": "Le Prince d'Égypte"
+  },
+  "3104719": {
+   "cat": "films",
+   "work": "The Full Monty"
+  },
+  "3108557": {
+   "cat": "films",
+   "work": "Absolute Beginners"
+  },
+  "3110548": {
+   "cat": "films",
+   "work": "National Treasure"
+  },
+  "3117931": {
+   "cat": "films",
+   "work": "Pirates des Caraïbes : La Malédiction du Black Pearl"
+  },
+  "3118025": {
+   "cat": "disney",
+   "work": "Lilo & Stitch"
+  },
+  "3118595": {
+   "cat": "disney",
+   "work": "Q189875"
+  },
+  "3118603": {
+   "cat": "disney",
+   "work": "Q189875"
+  },
+  "3118608": {
+   "cat": "disney",
+   "work": "Q189875"
+  },
+  "3133738": {
+   "out": true
+  },
+  "3144730": {
+   "out": true
+  },
+  "3169773": {
+   "cat": "films",
+   "work": "New York, New York"
+  },
+  "3169920": {
+   "out": true
+  },
+  "3203369": {
+   "cat": "disney",
+   "work": "Monstres et Cie"
+  },
+  "3744570": {
+   "cat": "anime",
+   "work": "Candy Candy"
+  },
+  "3744571": {
+   "cat": "anime",
+   "work": "Candy Candy"
+  },
+  "3773345": {
+   "cat": "tv",
+   "work": "Journal de 13 heures de TF1"
+  },
+  "3773349": {
+   "cat": "tv",
+   "work": "30 millions d'amis"
+  },
+  "3773355": {
+   "cat": "series",
+   "work": "Diff'rent Strokes"
+  },
+  "3773358": {
+   "cat": "series",
+   "work": "CHiPs"
+  },
+  "3773359": {
+   "cat": "series",
+   "work": "MacGyver"
+  },
+  "3773360": {
+   "cat": "series",
+   "work": "The Avengers"
+  },
+  "3773382": {
+   "cat": "series",
+   "work": "Lois & Clark: The New Adventures of Superman"
+  },
+  "3773384": {
+   "cat": "series",
+   "work": "The Addams Family"
+  },
+  "3773385": {
+   "cat": "tv",
+   "work": "E=M6"
+  },
+  "3773389": {
+   "cat": "tv",
+   "work": "Des chiffres et des lettres"
+  },
+  "3773392": {
+   "cat": "series",
+   "work": "Friends"
+  },
+  "3773396": {
+   "cat": "anime",
+   "work": "Candy Candy"
+  },
+  "3773400": {
+   "cat": "cartoons",
+   "work": "Scooby-Doo"
+  },
+  "3773405": {
+   "cat": "tv",
+   "work": "L'Île aux enfants"
+  },
+  "3917698": {
+   "cat": "films",
+   "work": "Batman"
+  },
+  "3931902": {
+   "cat": "anime",
+   "work": "Captain Future"
+  },
+  "4000407": {
+   "cat": "films",
+   "work": "Beetlejuice"
+  },
+  "4284272": {
+   "cat": "films",
+   "work": "The NeverEnding Story"
+  },
+  "4472006": {
+   "cat": "films",
+   "work": "Star Wars"
+  },
+  "4472007": {
+   "cat": "films",
+   "work": "Les Aventuriers de l'arche perdue"
+  },
+  "4472008": {
+   "cat": "films",
+   "work": "E.T. the Extra-Terrestrial"
+  },
+  "4472009": {
+   "cat": "films",
+   "work": "Le Grand Blond avec une chaussure noire"
+  },
+  "4472010": {
+   "cat": "films",
+   "work": "Un homme et une femme"
+  },
+  "4472011": {
+   "cat": "films",
+   "work": "Forbidden Games"
+  },
+  "4472012": {
+   "cat": "films",
+   "work": "The Umbrellas of Cherbourg"
+  },
+  "4472013": {
+   "cat": "films",
+   "work": "Superman"
+  },
+  "4472014": {
+   "cat": "films",
+   "work": "Retour vers le futur"
+  },
+  "4472015": {
+   "cat": "films",
+   "work": "James Bond"
+  },
+  "4472018": {
+   "cat": "films",
+   "work": "Rocky"
+  },
+  "4472019": {
+   "cat": "films",
+   "work": "La Boum"
+  },
+  "4472020": {
+   "cat": "films",
+   "work": "Top Gun"
+  },
+  "4472021": {
+   "cat": "films",
+   "work": "La Piscine"
+  },
+  "4472022": {
+   "cat": "films",
+   "work": "The Godfather"
+  },
+  "4472023": {
+   "cat": "films",
+   "work": "Le Clan des Siciliens"
+  },
+  "4472024": {
+   "cat": "films",
+   "work": "Borsalino"
+  },
+  "4472025": {
+   "cat": "films",
+   "work": "Pulp Fiction"
+  },
+  "4472026": {
+   "cat": "films",
+   "work": "Pretty Woman"
+  },
+  "4472027": {
+   "cat": "films",
+   "work": "The Good, the Bad and the Ugly"
+  },
+  "4472028": {
+   "cat": "films",
+   "work": "The Bridge on the River Kwai"
+  },
+  "4472029": {
+   "cat": "films",
+   "work": "The Shining"
+  },
+  "4472030": {
+   "cat": "films",
+   "work": "Psycho"
+  },
+  "4472031": {
+   "cat": "films",
+   "work": "Les Dents de la mer"
+  },
+  "4472032": {
+   "cat": "films",
+   "work": "Contempt"
+  },
+  "4472033": {
+   "cat": "films",
+   "work": "Lawrence of Arabia"
+  },
+  "4472035": {
+   "cat": "films",
+   "work": "Chariots of Fire"
+  },
+  "4472036": {
+   "cat": "films",
+   "work": "Basic Instinct"
+  },
+  "4472037": {
+   "cat": "films",
+   "work": "Ghost"
+  },
+  "4472038": {
+   "cat": "films",
+   "work": "Singin' in the Rain"
+  },
+  "4472039": {
+   "cat": "films",
+   "work": "Titanic"
+  },
+  "4472040": {
+   "cat": "films",
+   "work": "Limelight"
+  },
+  "4472041": {
+   "cat": "films",
+   "work": "Out of Africa"
+  },
+  "4472042": {
+   "cat": "films",
+   "work": "Autant en emporte le vent"
+  },
+  "4472043": {
+   "cat": "films",
+   "work": "Sissi"
+  },
+  "4472044": {
+   "cat": "films",
+   "work": "Love Story"
+  },
+  "4472045": {
+   "cat": "films",
+   "work": "Evita"
+  },
+  "4588774": {
+   "cat": "disney",
+   "work": "The Little Mermaid"
+  },
+  "4588779": {
+   "cat": "disney",
+   "work": "Aladdin"
+  },
+  "4588791": {
+   "cat": "disney",
+   "work": "Snow White and the Seven Dwarfs"
+  },
+  "4588793": {
+   "cat": "disney",
+   "work": "The Aristocats"
+  },
+  "4588794": {
+   "cat": "disney",
+   "work": "Snow White and the Seven Dwarfs"
+  },
+  "4588804": {
+   "cat": "disney",
+   "work": "Mary Poppins"
+  },
+  "4638727": {
+   "cat": "tv",
+   "work": "Mon incroyable fiancé"
+  },
+  "4760900": {
+   "cat": "films",
+   "work": "Boogie Nights"
+  },
+  "4952827": {
+   "out": true
+  },
+  "4955923": {
+   "cat": "tv",
+   "work": "Gym Tonic"
+  },
+  "5157705": {
+   "cat": "anime",
+   "work": "Tales of Little Women"
+  },
+  "5187200": {
+   "cat": "tv",
+   "work": "Intervilles"
+  },
+  "5413612": {
+   "cat": "disney",
+   "work": "Q189875"
+  },
+  "5510724": {
+   "cat": "films",
+   "work": "Austin Powers: The Spy Who Shagged Me"
+  },
+  "5510735": {
+   "cat": "films",
+   "work": "Austin Powers: The Spy Who Shagged Me"
+  },
+  "5933138": {
+   "cat": "tv",
+   "work": "30 millions d'amis"
+  },
+  "5933157": {
+   "cat": "anime",
+   "work": "Tom Sawyer"
+  },
+  "5933158": {
+   "cat": "anime",
+   "work": "Q15058038"
+  },
+  "6043249": {
+   "cat": "disney",
+   "work": "The Fox and the Hound"
+  },
+  "6043264": {
+   "cat": "series",
+   "work": "Le Collège des cœurs brisés"
+  },
+  "6172461": {
+   "cat": "cartoons",
+   "work": "Woody Woodpecker"
+  },
+  "6172947": {
+   "cat": "series",
+   "work": "Knight Rider"
+  },
+  "6172970": {
+   "cat": "series",
+   "work": "CHiPs"
+  },
+  "6172976": {
+   "cat": "series",
+   "work": "The Dukes of Hazzard"
+  },
+  "6173095": {
+   "cat": "tv",
+   "work": "Q13979"
+  },
+  "6173113": {
+   "cat": "anime",
+   "work": "Bioman"
+  },
+  "6184584": {
+   "cat": "tv",
+   "work": "Concours Eurovision de la chanson"
+  },
+  "6184625": {
+   "cat": "tv",
+   "work": "Ciné-club d'Antenne 2"
+  },
+  "6184627": {
+   "cat": "tv",
+   "work": "Aujourd'hui Madame"
+  },
+  "6184628": {
+   "cat": "tv",
+   "work": "Les Jeux de 20 heures"
+  },
+  "6358421": {
+   "cat": "cartoons",
+   "work": "T'choupi et Doudou"
+  },
+  "6473902": {
+   "cat": "anime",
+   "work": "Saint Seiya"
+  },
+  "6473904": {
+   "cat": "anime",
+   "work": "Fist of the North Star"
+  },
+  "6473908": {
+   "cat": "anime",
+   "work": "Aim for the Ace!"
+  },
+  "6473909": {
+   "cat": "anime",
+   "work": "Kinnikuman"
+  },
+  "6473915": {
+   "cat": "anime",
+   "work": "Bioman"
+  },
+  "6473917": {
+   "cat": "cartoons",
+   "work": "G.I. Joe: A Real American Hero"
+  },
+  "6473919": {
+   "cat": "cartoons",
+   "work": "Care Bears"
+  },
+  "6493927": {
+   "cat": "disney",
+   "work": "Toy Story"
+  },
+  "6517224": {
+   "cat": "disney",
+   "work": "Cars"
+  },
+  "6614211": {
+   "cat": "films",
+   "work": "The Matrix Reloaded"
+  },
+  "6614222": {
+   "cat": "films",
+   "work": "The Matrix Reloaded"
+  },
+  "6614826": {
+   "cat": "films",
+   "work": "Dead Man"
+  },
+  "6620918": {
+   "cat": "films",
+   "work": "Fast Times at Ridgemont High"
+  },
+  "6733960": {
+   "cat": "tv",
+   "work": "Concours Eurovision de la chanson"
+  },
+  "6734090": {
+   "cat": "tv",
+   "work": "Journal de 13 heures de TF1"
+  },
+  "6734091": {
+   "cat": "tv",
+   "work": "7 sur 7"
+  },
+  "6734093": {
+   "cat": "tv",
+   "work": "Fin des programmes d'Antenne 2"
+  },
+  "6734094": {
+   "cat": "tv",
+   "work": "Journal de TF1"
+  },
+  "6734096": {
+   "cat": "tv",
+   "work": "Les Étoiles du cinéma"
+  },
+  "6734106": {
+   "cat": "tv",
+   "work": "E=M6"
+  },
+  "6769019": {
+   "cat": "disney",
+   "work": "Toy Story 3"
+  },
+  "7087383": {
+   "cat": "disney",
+   "work": "Q179673"
+  },
+  "7238896": {
+   "cat": "films",
+   "work": "Austin Powers: The Spy Who Shagged Me"
+  },
+  "7238910": {
+   "cat": "films",
+   "work": "Die Another Day"
+  },
+  "7337263": {
+   "cat": "series",
+   "work": "Twin Peaks"
+  },
+  "7390090": {
+   "cat": "series",
+   "work": "Q1077"
+  },
+  "7402065": {
+   "cat": "games",
+   "work": "Q1046812"
+  },
+  "7675051": {
+   "cat": "films",
+   "work": "Top Gun"
+  },
+  "7675055": {
+   "cat": "films",
+   "work": "Top Gun"
+  },
+  "7675060": {
+   "cat": "films",
+   "work": "Top Gun"
+  },
+  "8134110": {
+   "cat": "anime",
+   "work": "Saint Seiya"
+  },
+  "8134117": {
+   "cat": "anime",
+   "work": "Maison Ikkoku"
+  },
+  "8174869": {
+   "cat": "tv",
+   "work": "Cocoricocoboy"
+  },
+  "8174874": {
+   "cat": "tv",
+   "work": "Gym Tonic"
+  },
+  "9125239": {
+   "cat": "series",
+   "work": "Scrubs"
+  },
+  "10345980": {
+   "cat": "anime",
+   "work": "But pour Rudy"
+  },
+  "10445868": {
+   "cat": "films",
+   "work": "Thor"
+  },
+  "10445885": {
+   "cat": "films",
+   "work": "Thor"
+  },
+  "10568969": {
+   "cat": "series",
+   "work": "Beverly Hills, 90210"
+  },
+  "10568970": {
+   "cat": "series",
+   "work": "Law & Order: Special Victims Unit"
+  },
+  "10568974": {
+   "cat": "series",
+   "work": "MacGyver"
+  },
+  "10568992": {
+   "cat": "series",
+   "work": "Alfred Hitchcock Presents"
+  },
+  "10568995": {
+   "cat": "series",
+   "work": "The Persuaders!"
+  },
+  "10569010": {
+   "cat": "series",
+   "work": "The Twilight Zone"
+  },
+  "10569013": {
+   "cat": "series",
+   "work": "Poltergeist: The Legacy"
+  },
+  "10569020": {
+   "cat": "series",
+   "work": "V"
+  },
+  "10569033": {
+   "cat": "series",
+   "work": "Belphégor ou le Fantôme du Louvre"
+  },
+  "10686738": {
+   "cat": "films",
+   "work": "Pretty in Pink"
+  },
+  "11007001": {
+   "cat": "series",
+   "work": "Pretty Little Liars"
+  },
+  "12619686": {
+   "cat": "anime",
+   "work": "Embrasse-moi Lucile"
+  },
+  "12619689": {
+   "cat": "anime",
+   "work": "Magical Princess Minky Momo"
+  },
+  "13277560": {
+   "cat": "disney",
+   "work": "The Lion King"
+  },
+  "13394802": {
+   "cat": "anime",
+   "work": "Ulysse 31"
+  },
+  "13394809": {
+   "cat": "tv",
+   "work": "Intervilles"
+  },
+  "13791941": {
+   "cat": "films",
+   "work": "The Batman"
+  },
+  "14628738": {
+   "cat": "films",
+   "work": "This Must Be the Place"
+  },
+  "14779865": {
+   "cat": "games",
+   "work": "Final Fantasy"
+  },
+  "14779872": {
+   "cat": "games",
+   "work": "Q170489"
+  },
+  "14879493": {
+   "out": true
+  },
+  "15639068": {
+   "cat": "films",
+   "work": "Charlie's Angels"
+  },
+  "16576207": {
+   "cat": "anime",
+   "work": "Candy Candy"
+  },
+  "16576216": {
+   "cat": "anime",
+   "work": "High School! Kimengumi"
+  },
+  "16601870": {
+   "cat": "series",
+   "work": "Premiers Baisers"
+  },
+  "16918515": {
+   "cat": "films",
+   "work": "The Hunger Games"
+  },
+  "16978460": {
+   "cat": "cartoons",
+   "work": "Barbapapa"
+  },
+  "16978486": {
+   "cat": "cartoons",
+   "work": "Babar"
+  },
+  "22732961": {
+   "cat": "games",
+   "work": "Superbrothers: Sword & Sworcery EP"
+  },
+  "22733031": {
+   "cat": "games",
+   "work": "Superbrothers: Sword & Sworcery EP"
+  },
+  "22733211": {
+   "cat": "games",
+   "work": "Superbrothers: Sword & Sworcery EP"
+  },
+  "24100861": {
+   "out": true
+  },
+  "24949681": {
+   "out": true
+  },
+  "26673441": {
+   "out": true
+  },
+  "28937911": {
+   "cat": "cartoons",
+   "work": "Around the World with Willy Fog"
+  },
+  "37224071": {
+   "cat": "anime",
+   "work": "Q15058038"
+  },
+  "38892061": {
+   "cat": "anime",
+   "work": "Judo Boy"
+  },
+  "38892121": {
+   "cat": "anime",
+   "work": "Space Adventure Cobra"
+  },
+  "41172221": {
+   "cat": "series",
+   "work": "The Sopranos"
+  },
+  "59988751": {
+   "cat": "tv",
+   "work": "Strip-tease"
+  },
+  "60608181": {
+   "cat": "tv",
+   "work": "Strip-tease"
+  },
+  "60973279": {
+   "out": true
+  },
+  "61887831": {
+   "cat": "games",
+   "work": "Mass Effect 3"
+  },
+  "62419007": {
+   "cat": "films",
+   "work": "Flashdance"
+  },
+  "63021368": {
+   "cat": "films",
+   "work": "The Adjustment Bureau"
+  },
+  "64920072": {
+   "cat": "films",
+   "work": "Drive"
+  },
+  "66114627": {
+   "cat": "anime",
+   "work": "Captain Future"
+  },
+  "66153008": {
+   "cat": "tv",
+   "work": "La Dernière Séance"
+  },
+  "66660698": {
+   "cat": "films",
+   "work": "The Great Gatsby"
+  },
+  "67231431": {
+   "cat": "films",
+   "work": "The Great Gatsby"
+  },
+  "67770820": {
+   "cat": "games",
+   "work": "The Last of Us"
+  },
+  "68529043": {
+   "cat": "series",
+   "work": "Orange Is the New Black"
+  },
+  "70962944": {
+   "cat": "series",
+   "work": "Dark"
+  },
+  "74105813": {
+   "out": true
+  },
+  "74729910": {
+   "cat": "games",
+   "work": "Q1986744"
+  },
+  "74730433": {
+   "cat": "games",
+   "work": "Sonic the Hedgehog"
+  },
+  "75779611": {
+   "cat": "films",
+   "work": "Coyote Ugly"
+  },
+  "75786188": {
+   "cat": "series",
+   "work": "Les Chevaliers du ciel"
+  },
+  "76278124": {
+   "cat": "disney",
+   "work": "Q189875"
+  },
+  "76774971": {
+   "cat": "games",
+   "work": "Remember Me"
+  },
+  "78042912": {
+   "out": true
+  },
+  "78378934": {
+   "cat": "tv",
+   "work": "Les Animaux du monde"
+  },
+  "78378936": {
+   "cat": "tv",
+   "work": "Aujourd'hui Madame"
+  },
+  "78378940": {
+   "cat": "tv",
+   "work": "30 millions d'amis"
+  },
+  "78378941": {
+   "cat": "tv",
+   "work": "Ciné-club d'Antenne 2"
+  },
+  "78378942": {
+   "cat": "tv",
+   "work": "Les Étoiles du cinéma"
+  },
+  "78378943": {
+   "cat": "tv",
+   "work": "Concours Eurovision de la chanson"
+  },
+  "78378945": {
+   "cat": "tv",
+   "work": "E=M6"
+  },
+  "78378946": {
+   "cat": "tv",
+   "work": "Les Jeux de 20 heures"
+  },
+  "81105456": {
+   "cat": "disney",
+   "work": "The Lion King"
+  },
+  "81670572": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "81670578": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "81670604": {
+   "cat": "anime",
+   "work": "Ulysse 31"
+  },
+  "82349908": {
+   "cat": "series",
+   "work": "Outlander"
+  },
+  "82715364": {
+   "cat": "films",
+   "work": "Skyfall"
+  },
+  "83216614": {
+   "cat": "games",
+   "work": "The Secret of Monkey Island"
+  },
+  "83216626": {
+   "cat": "games",
+   "work": "Shadow of the Colossus"
+  },
+  "84793867": {
+   "cat": "cartoons",
+   "work": "The Smurfs"
+  },
+  "84793871": {
+   "cat": "anime",
+   "work": "Saint Seiya"
+  },
+  "84793875": {
+   "cat": "cartoons",
+   "work": "Care Bears"
+  },
+  "84793881": {
+   "cat": "cartoons",
+   "work": "Denver, the Last Dinosaur"
+  },
+  "84793885": {
+   "cat": "anime",
+   "work": "Aim for the Ace!"
+  },
+  "84793887": {
+   "cat": "anime",
+   "work": "High School! Kimengumi"
+  },
+  "84793889": {
+   "cat": "anime",
+   "work": "But pour Rudy"
+  },
+  "84793891": {
+   "cat": "anime",
+   "work": "Maison Ikkoku"
+  },
+  "84793895": {
+   "cat": "anime",
+   "work": "Flo et les Robinson suisses"
+  },
+  "84793897": {
+   "cat": "cartoons",
+   "work": "Ferdy the Ant"
+  },
+  "84793899": {
+   "cat": "anime",
+   "work": "Lady Georgie"
+  },
+  "84793903": {
+   "cat": "anime",
+   "work": "Ohayō! Spank"
+  },
+  "84793905": {
+   "cat": "anime",
+   "work": "Hana no Ko Lunlun"
+  },
+  "84793907": {
+   "cat": "anime",
+   "work": "Tales of Little Women"
+  },
+  "84793909": {
+   "cat": "anime",
+   "work": "Embrasse-moi Lucile"
+  },
+  "84793915": {
+   "cat": "anime",
+   "work": "Magical Princess Minky Momo"
+  },
+  "84793923": {
+   "cat": "anime",
+   "work": "Makko"
+  },
+  "84793937": {
+   "cat": "anime",
+   "work": "Bioman"
+  },
+  "85341730": {
+   "cat": "tv",
+   "work": "Money Drop"
+  },
+  "85341736": {
+   "cat": "tv",
+   "work": "Money Drop"
+  },
+  "85341894": {
+   "cat": "tv",
+   "work": "Les 12 Coups de midi"
+  },
+  "85341896": {
+   "cat": "tv",
+   "work": "Les 12 Coups de midi"
+  },
+  "85341900": {
+   "cat": "tv",
+   "work": "Les 12 Coups de midi"
+  },
+  "85341920": {
+   "cat": "tv",
+   "work": "Les 12 Coups de midi"
+  },
+  "87493523": {
+   "cat": "tv",
+   "work": "J'irai dormir chez vous"
+  },
+  "87801269": {
+   "cat": "disney",
+   "work": "Les Nouveaux Héros"
+  },
+  "88037179": {
+   "cat": "games",
+   "work": "Final Fantasy VI"
+  },
+  "88037211": {
+   "cat": "games",
+   "work": "Final Fantasy VI"
+  },
+  "88037219": {
+   "cat": "games",
+   "work": "Final Fantasy VI"
+  },
+  "88037899": {
+   "cat": "games",
+   "work": "Donkey Kong Country 2: Diddy's Kong Quest"
+  },
+  "88038599": {
+   "cat": "games",
+   "work": "Q214232"
+  },
+  "88038669": {
+   "cat": "games",
+   "work": "Final Fantasy VI"
+  },
+  "88255467": {
+   "cat": "games",
+   "work": "Castlevania: Symphony of the Night"
+  },
+  "88595905": {
+   "cat": "games",
+   "work": "Assassin's Creed Unity"
+  },
+  "89262205": {
+   "cat": "games",
+   "work": "Q213911"
+  },
+  "90379179": {
+   "cat": "films",
+   "work": "The Hunger Games: Mockingjay – Part 1"
+  },
+  "90948465": {
+   "cat": "tv",
+   "work": "À prendre ou à laisser"
+  },
+  "91353644": {
+   "cat": "anime",
+   "work": "Les Entrechats"
+  },
+  "91353668": {
+   "cat": "anime",
+   "work": "Gil et Julie"
+  },
+  "92213590": {
+   "out": true
+  },
+  "92666240": {
+   "cat": "films",
+   "work": "Inside Llewyn Davis"
+  },
+  "93764872": {
+   "cat": "series",
+   "work": "Outlander"
+  },
+  "95460114": {
+   "cat": "series",
+   "work": "Salut les Musclés"
+  },
+  "95559640": {
+   "cat": "cartoons",
+   "work": "My Little Pony"
+  },
+  "95732226": {
+   "cat": "anime",
+   "work": "Turboranger"
+  },
+  "96808620": {
+   "cat": "cartoons",
+   "work": "SilverHawks"
+  },
+  "96808624": {
+   "cat": "anime",
+   "work": "Maison Ikkoku"
+  },
+  "96808626": {
+   "cat": "anime",
+   "work": "Attacker You!"
+  },
+  "96808630": {
+   "cat": "anime",
+   "work": "Urusei Yatsura"
+  },
+  "96808632": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "96808634": {
+   "cat": "cartoons",
+   "work": "My Little Pony"
+  },
+  "96808640": {
+   "cat": "anime",
+   "work": "Flashman"
+  },
+  "96808642": {
+   "cat": "anime",
+   "work": "Lady Georgie"
+  },
+  "96808650": {
+   "cat": "anime",
+   "work": "Bioman"
+  },
+  "96808652": {
+   "cat": "cartoons",
+   "work": "Care Bears"
+  },
+  "96816984": {
+   "cat": "tv",
+   "work": "Club Dorothée"
+  },
+  "96816990": {
+   "cat": "cartoons",
+   "work": "Conan the Adventurer"
+  },
+  "97065860": {
+   "cat": "series",
+   "work": "Le Miracle de l'amour"
+  },
+  "97792172": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "97879694": {
+   "cat": "anime",
+   "work": "Les Entrechats"
+  },
+  "97891480": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "98255132": {
+   "cat": "tv",
+   "work": "Récré A2"
+  },
+  "98264650": {
+   "cat": "anime",
+   "work": "Saint Seiya"
+  },
+  "98264658": {
+   "cat": "anime",
+   "work": "Saint Seiya"
+  },
+  "98315866": {
+   "cat": "tv",
+   "work": "Intervilles"
+  },
+  "98489178": {
+   "cat": "films",
+   "work": "Avengers: Age of Ultron"
+  },
+  "98951058": {
+   "cat": "films",
+   "work": "Fast & Furious 7"
+  },
+  "99314696": {
+   "cat": "series",
+   "work": "Premiers Baisers"
+  },
+  "102096884": {
+   "cat": "series",
+   "work": "Malcolm in the Middle"
+  },
+  "105090542": {
+   "cat": "cartoons",
+   "work": "Teletubbies"
+  },
+  "105413952": {
+   "cat": "disney",
+   "work": "The Aristocats"
+  },
+  "105413962": {
+   "cat": "disney",
+   "work": "The Aristocats"
+  },
+  "105413988": {
+   "cat": "disney",
+   "work": "The Aristocats"
+  },
+  "105433166": {
+   "cat": "cartoons",
+   "work": "Pole Position"
+  },
+  "106333158": {
+   "cat": "games",
+   "work": "Q10493813"
+  },
+  "106700014": {
+   "cat": "tv",
+   "work": "La Ferme Célébrités"
+  },
+  "108479442": {
+   "cat": "cartoons",
+   "work": "Barbapapa"
+  },
+  "108479560": {
+   "cat": "cartoons",
+   "work": "Barbapapa"
+  },
+  "108763152": {
+   "out": true
+  },
+  "109552784": {
+   "cat": "series",
+   "work": "Happy Days"
+  },
+  "110151526": {
+   "out": true
+  },
+  "114254006": {
+   "cat": "tv",
+   "work": "L'Île aux enfants"
+  },
+  "114254010": {
+   "cat": "tv",
+   "work": "Brok et Chnok"
+  },
+  "114839156": {
+   "cat": "games",
+   "work": "Q761815"
+  },
+  "115139940": {
+   "cat": "series",
+   "work": "Bewitched"
+  },
+  "118086198": {
+   "cat": "films",
+   "work": "The Life Aquatic with Steve Zissou"
+  },
+  "118209944": {
+   "cat": "films",
+   "work": "Star Trek"
+  },
+  "118259706": {
+   "out": true
+  },
+  "119820192": {
+   "cat": "series",
+   "work": "Vikings"
+  },
+  "122106738": {
+   "cat": "games",
+   "work": "Tetris"
+  },
+  "122946174": {
+   "cat": "films",
+   "work": "Alice de l'autre côté du miroir"
+  },
+  "126847165": {
+   "cat": "disney",
+   "work": "Le Monde de Dory"
+  },
+  "127557337": {
+   "out": true
+  },
+  "128049657": {
+   "out": true
+  },
+  "128049659": {
+   "out": true
+  },
+  "128049671": {
+   "out": true
+  },
+  "128253777": {
+   "cat": "games",
+   "work": "Final Fantasy VI"
+  },
+  "128548959": {
+   "cat": "series",
+   "work": "Big Little Lies"
+  },
+  "129041942": {
+   "cat": "games",
+   "work": "Q16681843"
+  },
+  "130387060": {
+   "cat": "games",
+   "work": "Q853143"
+  },
+  "130861654": {
+   "cat": "anime",
+   "work": "Candy Candy"
+  },
+  "132658388": {
+   "out": true
+  },
+  "132658392": {
+   "out": true
+  },
+  "134036426": {
+   "cat": "films",
+   "work": "Against All Odds"
+  },
+  "138886417": {
+   "out": true
+  },
+  "138886433": {
+   "out": true
+  },
+  "139164189": {
+   "cat": "games",
+   "work": "VA-11 Hall-A"
+  },
+  "139785435": {
+   "cat": "series",
+   "work": "Victoria"
+  },
+  "141821171": {
+   "cat": "games",
+   "work": "Final Fantasy VII"
+  },
+  "141821179": {
+   "cat": "games",
+   "work": "Uncharted"
+  },
+  "142745594": {
+   "cat": "films",
+   "work": "Terminator 2 : Le Jugement dernier"
+  },
+  "144130194": {
+   "cat": "disney",
+   "work": "Q179673"
+  },
+  "144130214": {
+   "cat": "disney",
+   "work": "Q179673"
+  },
+  "353398321": {
+   "out": true
+  },
+  "376195071": {
+   "cat": "disney",
+   "work": "Vaiana : La Légende du bout du monde"
+  },
+  "376773331": {
+   "cat": "games",
+   "work": "Guild Wars"
+  },
+  "393264032": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "393264042": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "393264072": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "393731742": {
+   "cat": "films",
+   "work": "Reality Bites"
+  },
+  "403302892": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "403303122": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "412379012": {
+   "cat": "cartoons",
+   "work": "Miraculous: Tales of Ladybug & Cat Noir"
+  },
+  "418649462": {
+   "cat": "cartoons",
+   "work": "Inspector Gadget"
+  },
+  "435175522": {
+   "cat": "films",
+   "work": "The Greatest Showman"
+  },
+  "436372462": {
+   "out": true
+  },
+  "454541652": {
+   "cat": "anime",
+   "work": "Makko"
+  },
+  "455209392": {
+   "out": true
+  },
+  "456965032": {
+   "cat": "films",
+   "work": "Black Panther"
+  },
+  "462858582": {
+   "cat": "games",
+   "work": "Q4267401"
+  },
+  "473236362": {
+   "out": true
+  },
+  "475644542": {
+   "cat": "tv",
+   "work": "Formule 1"
+  },
+  "495003572": {
+   "out": true
+  },
+  "510698742": {
+   "cat": "films",
+   "work": "The Matrix"
+  },
+  "517026322": {
+   "cat": "games",
+   "work": "Q1800173"
+  },
+  "517026342": {
+   "cat": "games",
+   "work": "Q1800173"
+  },
+  "517026362": {
+   "out": true
+  },
+  "518473892": {
+   "cat": "films",
+   "work": "Les Aventuriers de l'arche perdue"
+  },
+  "520671992": {
+   "cat": "games",
+   "work": "Q16259390"
+  },
+  "520989832": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "520996232": {
+   "cat": "games",
+   "work": "Q54617566"
+  },
+  "529928571": {
+   "cat": "films",
+   "work": "O Brother, Where Art Thou?"
+  },
+  "534375642": {
+   "cat": "disney",
+   "work": "Q171300"
+  },
+  "534375692": {
+   "cat": "disney",
+   "work": "Q171300"
+  },
+  "540165792": {
+   "cat": "series",
+   "work": "CSI: Crime Scene Investigation"
+  },
+  "541232812": {
+   "cat": "anime",
+   "work": "Captain Future"
+  },
+  "541232832": {
+   "cat": "anime",
+   "work": "The Mysterious Cities of Gold"
+  },
+  "541232862": {
+   "cat": "cartoons",
+   "work": "Spider-Man and His Amazing Friends"
+  },
+  "541232872": {
+   "cat": "anime",
+   "work": "Les Entrechats"
+  },
+  "541232902": {
+   "cat": "anime",
+   "work": "Ulysse 31"
+  },
+  "541232912": {
+   "cat": "anime",
+   "work": "Ulysse 31"
+  },
+  "541232942": {
+   "cat": "anime",
+   "work": "Tom Sawyer"
+  },
+  "541232952": {
+   "cat": "anime",
+   "work": "Candy Candy"
+  },
+  "541232992": {
+   "cat": "anime",
+   "work": "Q15058038"
+  },
+  "541233002": {
+   "cat": "anime",
+   "work": "Space Adventure Cobra"
+  },
+  "541233082": {
+   "cat": "series",
+   "work": "The Persuaders!"
+  },
+  "541233132": {
+   "cat": "series",
+   "work": "The Avengers"
+  },
+  "541233222": {
+   "cat": "series",
+   "work": "The Six Million Dollar Man"
+  },
+  "549243572": {
+   "cat": "films",
+   "work": "O Brother, Where Art Thou?"
+  },
+  "552057672": {
+   "cat": "games",
+   "work": "The Messenger"
+  },
+  "552088032": {
+   "cat": "games",
+   "work": "Q213911"
+  },
+  "558922562": {
+   "cat": "anime",
+   "work": "Naruto"
+  },
+  "560321032": {
+   "out": true
+  },
+  "561878612": {
+   "cat": "disney",
+   "work": "Q322328"
+  },
+  "568393732": {
+   "out": true
+  },
+  "572368282": {
+   "cat": "cartoons",
+   "work": "She-Ra, la princesse du pouvoir"
+  },
+  "578513132": {
+   "cat": "disney",
+   "work": "Snow White and the Seven Dwarfs"
+  },
+  "578513222": {
+   "cat": "disney",
+   "work": "Snow White and the Seven Dwarfs"
+  },
+  "586860862": {
+   "cat": "disney",
+   "work": "Q15270647"
+  },
+  "588407772": {
+   "cat": "games",
+   "work": "Castlevania"
+  },
+  "594252432": {
+   "cat": "cartoons",
+   "work": "Challenge of the GoBots"
+  },
+  "594252462": {
+   "cat": "cartoons",
+   "work": "Care Bears"
+  },
+  "594252482": {
+   "cat": "anime",
+   "work": "Captain Future"
+  },
+  "594252492": {
+   "cat": "cartoons",
+   "work": "The Transformers"
+  },
+  "594252502": {
+   "cat": "cartoons",
+   "work": "He-Man and the Masters of the Universe"
+  },
+  "594252522": {
+   "cat": "anime",
+   "work": "Attacker You!"
+  },
+  "594252592": {
+   "cat": "anime",
+   "work": "Flashman"
+  },
+  "594252732": {
+   "cat": "anime",
+   "work": "Aim for the Ace!"
+  },
+  "594252762": {
+   "cat": "cartoons",
+   "work": "G.I. Joe: A Real American Hero"
+  },
+  "594252772": {
+   "cat": "anime",
+   "work": "High School! Kimengumi"
+  },
+  "594252932": {
+   "cat": "anime",
+   "work": "Dragon Quest: The Adventure of Dai"
+  },
+  "598063632": {
+   "cat": "disney",
+   "work": "Peter Pan"
+  },
+  "598063642": {
+   "cat": "disney",
+   "work": "Peter Pan"
+  },
+  "598615992": {
+   "cat": "games",
+   "work": "Gris"
+  },
+  "598616052": {
+   "cat": "games",
+   "work": "Gris"
+  },
+  "598616112": {
+   "cat": "games",
+   "work": "Gris"
+  },
+  "598616122": {
+   "cat": "games",
+   "work": "Gris"
+  },
+  "598616132": {
+   "cat": "games",
+   "work": "Gris"
+  },
+  "598616172": {
+   "cat": "games",
+   "work": "Gris"
+  },
+  "598616222": {
+   "cat": "games",
+   "work": "Gris"
+  },
+  "598616232": {
+   "cat": "games",
+   "work": "Gris"
+  },
+  "598884752": {
+   "out": true
+  },
+  "613917452": {
+   "cat": "disney",
+   "work": "Tarzan"
+  },
+  "615103672": {
+   "cat": "tv",
+   "work": "C'est mon choix"
+  },
+  "617551662": {
+   "cat": "cartoons",
+   "work": "Code Lyoko"
+  },
+  "621145402": {
+   "cat": "games",
+   "work": "Q752835"
+  },
+  "621145452": {
+   "cat": "games",
+   "work": "Q752835"
+  },
+  "621145612": {
+   "cat": "games",
+   "work": "Q752835"
+  },
+  "621145662": {
+   "cat": "games",
+   "work": "Q752835"
+  },
+  "621152512": {
+   "cat": "games",
+   "work": "Silent Hill 3"
+  },
+  "621528182": {
+   "cat": "anime",
+   "work": "Maison Ikkoku"
+  },
+  "621528272": {
+   "cat": "anime",
+   "work": "Bioman"
+  },
+  "621951702": {
+   "cat": "anime",
+   "work": "Saint Seiya"
+  },
+  "645005412": {
+   "cat": "series",
+   "work": "Les Vacances de l'amour"
+  },
+  "647374412": {
+   "cat": "films",
+   "work": "Her"
+  },
+  "647394572": {
+   "cat": "films",
+   "work": "Harry Potter and the Deathly Hallows – Part 2"
+  },
+  "647445312": {
+   "cat": "films",
+   "work": "La Grande Aventure Lego"
+  },
+  "667115012": {
+   "cat": "tv",
+   "work": "Récré A2"
+  },
+  "674500272": {
+   "cat": "games",
+   "work": "Star Fox"
+  },
+  "678700642": {
+   "cat": "cartoons",
+   "work": "The Smurfs"
+  },
+  "682715632": {
+   "out": true
+  },
+  "687983162": {
+   "cat": "anime",
+   "work": "Sailor Moon"
+  },
+  "698708592": {
+   "cat": "anime",
+   "work": "Les Entrechats"
+  },
+  "701326562": {
+   "cat": "films",
+   "work": "Despicable Me 2"
+  },
+  "715555892": {
+   "cat": "disney",
+   "work": "The Lion King"
+  },
+  "723393732": {
+   "cat": "films",
+   "work": "Good Will Hunting"
+  },
+  "736327052": {
+   "out": true
+  },
+  "736327072": {
+   "out": true
+  },
+  "736327082": {
+   "out": true
+  },
+  "736327112": {
+   "out": true
+  },
+  "738399912": {
+   "cat": "series",
+   "work": "Daredevil"
+  },
+  "741779692": {
+   "out": true
+  },
+  "750731732": {
+   "out": true
+  },
+  "750731862": {
+   "out": true
+  },
+  "770671372": {
+   "cat": "games",
+   "work": "Tetris"
+  },
+  "814068272": {
+   "out": true
+  },
+  "845963862": {
+   "cat": "games",
+   "work": "Grand Theft Auto V"
+  },
+  "857820842": {
+   "cat": "games",
+   "work": "Professor Layton and the Curious Village"
+  },
+  "862106292": {
+   "cat": "games",
+   "work": "Medal of Honor"
+  },
+  "872370952": {
+   "cat": "cartoons",
+   "work": "SilverHawks"
+  },
+  "872370972": {
+   "cat": "anime",
+   "work": "Goldorak"
+  },
+  "872371102": {
+   "cat": "anime",
+   "work": "Fist of the North Star"
+  },
+  "881375172": {
+   "cat": "games",
+   "work": "Q16267631"
+  },
+  "912027902": {
+   "cat": "games",
+   "work": "DuckTales"
+  },
+  "923677172": {
+   "out": true
+  },
+  "926019952": {
+   "cat": "games",
+   "work": "Q111045952"
+  },
+  "926020032": {
+   "cat": "games",
+   "work": "Q111045952"
+  },
+  "926317852": {
+   "out": true
+  },
+  "963547832": {
+   "cat": "games",
+   "work": "Tetris"
+  },
+  "965335572": {
+   "cat": "games",
+   "work": "Streets of Rage 2"
+  },
+  "975880922": {
+   "out": true
+  },
+  "975906892": {
+   "out": true
+  },
+  "975978682": {
+   "out": true
+  },
+  "976060262": {
+   "out": true
+  },
+  "976069272": {
+   "out": true
+  },
+  "976109912": {
+   "out": true
+  },
+  "976184672": {
+   "out": true
+  },
+  "976227442": {
+   "out": true
+  },
+  "987461782": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "987461792": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "987461802": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "992412312": {
+   "out": true
+  },
+  "1024948992": {
+   "out": true
+  },
+  "1037848742": {
+   "cat": "cartoons",
+   "work": "Il était une fois… l'Espace"
+  },
+  "1053151152": {
+   "cat": "games",
+   "work": "Q213911"
+  },
+  "1093338122": {
+   "cat": "anime",
+   "work": "Demon Slayer"
+  },
+  "1100435192": {
+   "out": true
+  },
+  "1100617702": {
+   "out": true
+  },
+  "1126082282": {
+   "cat": "anime",
+   "work": "City Hunter"
+  },
+  "1160635762": {
+   "cat": "games",
+   "work": "Q170489"
+  },
+  "1164760752": {
+   "cat": "films",
+   "work": "Jailhouse Rock"
+  },
+  "1173673022": {
+   "cat": "disney",
+   "work": "Q64744044"
+  },
+  "1173679732": {
+   "cat": "disney",
+   "work": "Q64744044"
+  },
+  "1177738702": {
+   "cat": "games",
+   "work": "Anno 1800"
+  },
+  "1181039152": {
+   "cat": "cartoons",
+   "work": "Il était une fois… la Vie"
+  },
+  "1181114902": {
+   "cat": "cartoons",
+   "work": "Il était une fois… les Explorateurs"
+  },
+  "1187434212": {
+   "cat": "games",
+   "work": "Q1800173"
+  },
+  "1197423092": {
+   "cat": "games",
+   "work": "Q1800173"
+  },
+  "1204119162": {
+   "out": true
+  },
+  "1204119222": {
+   "out": true
+  },
+  "1208560332": {
+   "cat": "cartoons",
+   "work": "Il était une fois… les Découvreurs"
+  },
+  "1240933682": {
+   "out": true
+  },
+  "1253608232": {
+   "cat": "tv",
+   "work": "Questions pour un champion"
+  },
+  "1253608282": {
+   "cat": "tv",
+   "work": "Questions pour un champion"
+  },
+  "1255263452": {
+   "cat": "films",
+   "work": "Police Academy"
+  },
+  "1263897792": {
+   "cat": "anime",
+   "work": "Ohayō! Spank"
+  },
+  "1327111502": {
+   "cat": "tv",
+   "work": "Le Bébête Show"
+  },
+  "1327111622": {
+   "cat": "tv",
+   "work": "Cocoricocoboy"
+  },
+  "1327111642": {
+   "cat": "tv",
+   "work": "Cocoricocoboy"
+  },
+  "1327111652": {
+   "cat": "tv",
+   "work": "Cocoricocoboy"
+  },
+  "1349489382": {
+   "cat": "games",
+   "work": "Q50356175"
+  },
+  "1349489412": {
+   "cat": "games",
+   "work": "Q50356175"
+  },
+  "1349489432": {
+   "cat": "games",
+   "work": "Q50356175"
+  },
+  "1349489442": {
+   "cat": "games",
+   "work": "Q50356175"
+  },
+  "1349489482": {
+   "cat": "games",
+   "work": "Q50356175"
+  },
+  "1349489512": {
+   "cat": "games",
+   "work": "Q50356175"
+  },
+  "1393976262": {
+   "cat": "games",
+   "work": "Q16267631"
+  },
+  "1398263002": {
+   "cat": "tv",
+   "work": "Affaires familiales"
+  },
+  "1402814722": {
+   "cat": "games",
+   "work": "Q21039915"
+  },
+  "1447521702": {
+   "out": true
+  },
+  "1453599782": {
+   "cat": "cartoons",
+   "work": "Tom and Jerry"
+  },
+  "1471413472": {
+   "cat": "games",
+   "work": "Another World"
+  },
+  "1477486432": {
+   "out": true
+  },
+  "1477486452": {
+   "out": true
+  },
+  "1495063812": {
+   "out": true
+  },
+  "1518210032": {
+   "cat": "games",
+   "work": "Q1339030"
+  },
+  "1518997952": {
+   "cat": "films",
+   "work": "Guardians of the Galaxy Vol. 2"
+  },
+  "1518998022": {
+   "cat": "films",
+   "work": "Guardians of the Galaxy"
+  },
+  "1522831532": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "1540063462": {
+   "cat": "anime",
+   "work": "Beyblade"
+  },
+  "1550795082": {
+   "cat": "disney",
+   "work": "Encanto"
+  },
+  "1550795102": {
+   "cat": "disney",
+   "work": "Encanto"
+  },
+  "1550795112": {
+   "cat": "disney",
+   "work": "Encanto"
+  },
+  "1550795122": {
+   "cat": "disney",
+   "work": "Encanto"
+  },
+  "1550795132": {
+   "cat": "disney",
+   "work": "Encanto"
+  },
+  "1550795162": {
+   "cat": "disney",
+   "work": "Encanto"
+  },
+  "1554972272": {
+   "cat": "series",
+   "work": "The Wheel of Time"
+  },
+  "1620373862": {
+   "out": true
+  },
+  "1635059162": {
+   "cat": "series",
+   "work": "Around the World in 80 Days"
+  },
+  "1661037282": {
+   "cat": "disney",
+   "work": "Alerte rouge"
+  },
+  "1668844012": {
+   "out": true
+  },
+  "1668844062": {
+   "out": true
+  },
+  "1675161847": {
+   "cat": "disney",
+   "work": "Alerte rouge"
+  },
+  "1692240927": {
+   "cat": "games",
+   "work": "Hollow Knight"
+  },
+  "1708368997": {
+   "cat": "anime",
+   "work": "Digimon Adventure"
+  },
+  "1708657467": {
+   "cat": "games",
+   "work": "Q96240947"
+  },
+  "1708657497": {
+   "cat": "games",
+   "work": "Q96240947"
+  },
+  "1708657537": {
+   "cat": "games",
+   "work": "Q96240947"
+  },
+  "1708657547": {
+   "cat": "games",
+   "work": "Q96240947"
+  },
+  "1708657587": {
+   "cat": "games",
+   "work": "Q96240947"
+  },
+  "1708657597": {
+   "cat": "games",
+   "work": "Q96240947"
+  },
+  "1722903277": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "1722903287": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "1722903297": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "1734139447": {
+   "out": true
+  },
+  "1741502547": {
+   "out": true
+  },
+  "1764283617": {
+   "cat": "films",
+   "work": "Top Gun: Maverick"
+  },
+  "1899509917": {
+   "cat": "series",
+   "work": "Cosmos: A Spacetime Odyssey"
+  },
+  "1922350687": {
+   "out": true
+  },
+  "1926469437": {
+   "cat": "games",
+   "work": "Kena: Bridge of Spirits"
+  },
+  "1937372717": {
+   "cat": "series",
+   "work": "Le Seigneur des anneaux : Les Anneaux de pouvoir"
+  },
+  "1985424627": {
+   "cat": "disney",
+   "work": "Encanto"
+  },
+  "2043756237": {
+   "cat": "films",
+   "work": "Police Academy"
+  },
+  "2069246347": {
+   "cat": "films",
+   "work": "Avatar: The Way of Water"
+  },
+  "2103498417": {
+   "cat": "tv",
+   "work": "Gym Tonic"
+  },
+  "2119680937": {
+   "cat": "games",
+   "work": "Hogwarts Legacy"
+  },
+  "2119681207": {
+   "cat": "games",
+   "work": "Hogwarts Legacy"
+  },
+  "2125613947": {
+   "cat": "series",
+   "work": "1923"
+  },
+  "2126030287": {
+   "cat": "series",
+   "work": "Veronica Mars"
+  },
+  "2128227357": {
+   "out": true
+  },
+  "2204149117": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2204149167": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2204149187": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2204149257": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2204149487": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2204149547": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2204149627": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2204149667": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2204149817": {
+   "cat": "games",
+   "work": "Detroit: Become Human"
+  },
+  "2216784257": {
+   "out": true
+  },
+  "2224193917": {
+   "cat": "series",
+   "work": "Alice in Borderland"
+  },
+  "2246057377": {
+   "cat": "cartoons",
+   "work": "Oggy and the Cockroaches"
+  },
+  "2253995877": {
+   "cat": "games",
+   "work": "The Elder Scrolls III: Morrowind"
+  },
+  "2256713537": {
+   "cat": "films",
+   "work": "Guardians of the Galaxy Vol. 3"
+  },
+  "2299031295": {
+   "out": true
+  },
+  "2321961665": {
+   "cat": "games",
+   "work": "Ultrakill"
+  },
+  "2321961845": {
+   "cat": "games",
+   "work": "Ultrakill"
+  },
+  "2346505225": {
+   "cat": "cartoons",
+   "work": "The Dragon Prince"
+  },
+  "2361406185": {
+   "out": true
+  },
+  "2392970065": {
+   "out": true
+  },
+  "2411439855": {
+   "out": true
+  },
+  "2421233375": {
+   "out": true
+  },
+  "2448174235": {
+   "out": true
+  },
+  "2485662691": {
+   "out": true
+  },
+  "2485672201": {
+   "out": true
+  },
+  "2493772091": {
+   "cat": "series",
+   "work": "Money Heist"
+  },
+  "2493772121": {
+   "cat": "series",
+   "work": "The Expanse"
+  },
+  "2498405171": {
+   "cat": "disney",
+   "work": "Wish : Asha et la bonne étoile"
+  },
+  "2503850331": {
+   "cat": "games",
+   "work": "Final Fantasy VI"
+  },
+  "2523880531": {
+   "cat": "games",
+   "work": "Q575505"
+  },
+  "2532284081": {
+   "cat": "games",
+   "work": "Q108417001"
+  },
+  "2536769101": {
+   "cat": "disney",
+   "work": "Wish : Asha et la bonne étoile"
+  },
+  "2548151252": {
+   "cat": "disney",
+   "work": "Wish : Asha et la bonne étoile"
+  },
+  "2548151262": {
+   "cat": "disney",
+   "work": "Wish : Asha et la bonne étoile"
+  },
+  "2550488572": {
+   "out": true
+  },
+  "2550488592": {
+   "out": true
+  },
+  "2556269152": {
+   "cat": "tv",
+   "work": "Récré A2"
+  },
+  "2598256782": {
+   "cat": "series",
+   "work": "Le Seigneur des anneaux : Les Anneaux de pouvoir"
+  },
+  "2618787722": {
+   "out": true
+  },
+  "2726675361": {
+   "out": true
+  },
+  "2749390631": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "2766333431": {
+   "cat": "games",
+   "work": "No Man's Sky"
+  },
+  "2846401192": {
+   "out": true
+  },
+  "2850582692": {
+   "cat": "games",
+   "work": "Beyond Good & Evil"
+  },
+  "2852299832": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299842": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299852": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299862": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299872": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299882": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299902": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299922": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299952": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299962": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852299992": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2852300042": {
+   "cat": "games",
+   "work": "Vampire Survivors"
+  },
+  "2870893462": {
+   "out": true
+  },
+  "2966177431": {
+   "out": true
+  },
+  "3113866141": {
+   "cat": "series",
+   "work": "Dune: Prophecy"
+  },
+  "3128754491": {
+   "cat": "games",
+   "work": "Q126414597"
+  },
+  "3188628921": {
+   "cat": "games",
+   "work": "Balatro"
+  },
+  "3274237351": {
+   "cat": "disney",
+   "work": "Snow White and the Seven Dwarfs"
+  },
+  "3357356181": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "3357356191": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "3416758021": {
+   "cat": "series",
+   "work": "Game of Thrones"
+  },
+  "3416758301": {
+   "cat": "series",
+   "work": "The Witcher"
+  },
+  "3495492271": {
+   "cat": "games",
+   "work": "No Man's Sky"
+  },
+  "3529317501": {
+   "out": true
+  },
+  "3610899012": {
+   "cat": "series",
+   "work": "Dune: Prophecy"
+  },
+  "3782955142": {
+   "cat": "series",
+   "work": "Peaky Blinders"
+  },
+  "3810427822": {
+   "out": true
+  },
+  "3851153081": {
+   "out": true
+  },
+  "3921837021": {
+   "out": true
+  },
+  "3966155071": {
+   "cat": "games",
+   "work": "Atomic Heart"
+  },
+  "4004878991": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "4004879021": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "4004879031": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "4004879041": {
+   "cat": "games",
+   "work": "Minecraft"
+  },
+  "4006779471": {
+   "cat": "games",
+   "work": "Final Fantasy XIV"
+  },
+  "4104972091": {
+   "out": true
+  },
+  "4283116372": {
+   "out": true
+  },
+  "4283116382": {
+   "out": true
+  },
+  "4283116412": {
+   "out": true
+  }
+ },
+ "works": {
+  "Q2484680": {
+   "name": "James Bond"
+  },
+  "Q88306753": {
+   "name": "Thor"
+  },
+  "Q1294344": {
+   "cat": "tv"
+  },
+  "Q3519442": {
+   "cat": "tv"
+  },
+  "Q3413931": {
+   "cat": "tv"
+  },
+  "Q3232161": {
+   "cat": "tv"
+  },
+  "Q499767": {
+   "cat": "tv"
+  },
+  "Q4115772": {
+   "cat": "tv"
+  },
+  "Q201052": {
+   "cat": "tv"
+  },
+  "Q13979": {
+   "cat": "tv"
+  },
+  "Q33162": {
+   "cat": "tv"
+  },
+  "Q486844": {
+   "cat": "tv"
+  },
+  "Q3348104": {
+   "cat": "tv"
+  },
+  "Q11882086": {
+   "cat": "tv"
+  },
+  "Q2903732": {
+   "cat": "tv"
+  },
+  "Q55600032": {
+   "cat": "tv"
+  },
+  "Q784577": {
+   "cat": "tv"
+  },
+  "Q3205682": {
+   "cat": "tv"
+  },
+  "Q2234198": {
+   "cat": "tv"
+  },
+  "Q155629": {
+   "cat": "tv"
+  },
+  "Q213588": {
+   "cat": "tv"
+  },
+  "Q1151438": {
+   "cat": "anime"
+  },
+  "Q1196705": {
+   "cat": "anime"
+  },
+  "Q2339451": {
+   "cat": "anime"
+  },
+  "Q28721283": {
+   "cat": "anime"
+  },
+  "Q130325295": {
+   "cat": "cartoons"
+  },
+  "Q1370881": {
+   "name": "Les Chevaliers du Zodiaque"
+  },
+  "Q4174726": {
+   "name": "Ken le Survivant"
+  },
+  "Q368822": {
+   "name": "Flashman"
+  },
+  "Q710946": {
+   "name": "Cobra"
+  },
+  "Q1334287": {
+   "name": "Cowboy Bebop"
+  },
+  "Q16138249": {
+   "name": "Sailor Moon"
+  },
+  "Q1154421": {
+   "cat": "disney"
+  },
+  "Q938641": {
+   "name": "Kingdom Hearts"
+  },
+  "Q107424329": {
+   "name": "Uncharted 3"
+  },
+  "Q10161": {
+   "name": "Concours Eurovision de la chanson"
+  },
+  "Q117485422": {
+   "name": "Jeux sans frontières"
+  },
+  "Q111703179": {
+   "name": "Danse avec les stars"
+  },
+  "Q7795474": {
+   "name": "Qui veut gagner des millions ?"
+  },
+  "Q5120647": {
+   "name": "Ciné-club"
+  },
+  "Q10262941": {
+   "name": "Caméra Café"
+  },
+  "Q376045": {
+   "out": true
+  },
+  "Q15711878": {
+   "out": true
+  },
+  "Q20922": {
+   "out": true
+  },
+  "Q15058038": {
+   "name": "Lady Oscar"
+  }
+ },
+ "animeOut": []
 }

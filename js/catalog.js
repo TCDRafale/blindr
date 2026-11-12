@@ -19,8 +19,6 @@ export const CATEGORIES = [
   { id: 'anime',    label: 'Anime',             emoji: '⛩️', color: '#ff3d81', work: true, playlists: [5206929684, 9016993522, 11225266244, 11225268324, 11215654264, 7490833544, 12324246211, 11170914824, 4859699704, 8977497562, 14630236521, 11170572584] },
   { id: 'games',    label: 'Jeux vidéo',        emoji: '🎮', color: '#8bff5a', work: true, playlists: [7747193762, 4335231942, 13252291043, 8520282922] },
   { id: 'tv',       label: 'Émissions TV',      emoji: '🎙️', color: '#b388ff', work: true, playlists: [53041454, 15874573521, 11360363604, 31165972, 1647632711, 2156993722, 14179152301, 33852468] },
-  // Publicités : musiques de pubs ; la réponse est la chanson (la marque n'est pas connue des playlists).
-  { id: 'ads',      label: 'Publicités',        emoji: '📣', color: '#ff6b9a', playlists: [1267962552, 15804714121, 9749998142, 1626915875, 9046419802] },
 ];
 
 export const CAT_BY_ID = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));

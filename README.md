@@ -13,7 +13,7 @@ node tools/build-catalog.mjs --refresh  # re-télécharge aussi les playlists De
 - **Sources** : playlists Deezer de chaque catégorie (`js/catalog.js`), plus les œuvres les plus connues de Wikidata dont le thème est trouvé sur Deezer.
 - **Une œuvre, une catégorie** : chaque morceau est rattaché à une entité Wikidata, et c'est son type qui décide de la catégorie (film, film d'animation Disney, série, série animée, anime, émission, jeu). Les génériques français d'anime vont en Anime.
 - **Difficulté** : œuvres classées par vues de leur page Wikipédia française sur 12 mois, un tiers par niveau. Musique : popularité Deezer.
-- **Corrections** : `tools/overrides.json` (exclure, forcer une œuvre ou une catégorie, renommer, fixer un niveau), prioritaire sur le tri automatique. L'écran Catalogue de l'app permet d'exclure ou de remettre en jeu un titre et de copier ces corrections.
+- **Corrections** : `tools/overrides.json` (exclure, forcer une œuvre ou une catégorie, renommer, fixer un niveau), prioritaire sur le tri automatique. Une correction peut nommer l'œuvre (« Top Gun ») : le script retrouve sa fiche Wikidata, donc sa popularité et son image. Le fichier contient la relecture manuelle de tout le catalogue. L'écran Catalogue de l'app permet d'exclure ou de remettre en jeu un titre et de copier ces corrections.
 - **Revue** : chaque construction produit `tools/review.html` (œuvres par niveau, titres écartés avec leur raison).
 
 ## En jeu

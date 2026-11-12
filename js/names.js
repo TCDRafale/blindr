@@ -36,10 +36,16 @@ export function cleanShowTitle(t) {
     .trim() || t;
 }
 
-export const SOUNDTRACK_RE = /(soundtrack|motion picture|bande originale|\bscore\b|video game|original game|o\.s\.t|\bost\b|music from|original series|générique original|du film|complete recordings|tv series)/i;
+export const SOUNDTRACK_RE = /(soundtrack|sound track|motion picture|bande originale|\bscore\b|video game|original game|o\.s\.t|\bost\b|music from|original series|générique original|du film|complete recordings|tv series)/i;
 export const COMPIL_RE = /(best of|génériques|generiques|plus belles|hits|vol\.|volume|magie|compil|collection|essentials|ultimate|greatest|meilleur|\btop\b|disneyland|revisit)/i;
 
 export function cleanWork(s) {
+  const r = cleanWorkOnce(s);
+  if (r || !/:/.test(s)) return r;
+  // « Titanic: Music from the Motion Picture Soundtrack » : tout ce qui suit les deux-points est du bruit.
+  return cleanWorkOnce(s.split(/\s*:\s*/)[0]);
+}
+function cleanWorkOnce(s) {
   return s
     .replace(/\s*[\(\[].*?([\)\]]|$)/g, '')
     .replace(/^selections from (the )?(original )?(motion picture )?(soundtrack )?/i, '')       // « Selections From The Original Soundtrack The Woman In Red »
@@ -47,7 +53,7 @@ export function cleanWork(s) {
     .replace(/^[^-–:]*:\s*(?:more )?music (?:from|of) (?:the )?/i, '')   // « Distant Worlds II: More Music from Final Fantasy »
     .replace(/^(quentin tarantino|tim burton|wes anderson|baz luhrmann|steven spielberg|stanley kubrick|guillermo del toro|james cameron|christopher nolan|martin scorsese|walt disney|disney|pixar)[’']s\s+/i, '')
     .replace(/\s+[-–]\s+.*$/, '')
-    .replace(/\b(the )?(official )?(original )?(video game |motion picture |game |tv |series |music )*(soundtrack|score)( recordings?)?\b.*$/i, '')
+    .replace(/\b(the )?(official )?(original )?(video game |motion picture |game |tv |series |music )*(soundtrack|sound track|score)( recordings?)?\b.*$/i, '')
     .replace(/\bbande originale.*$/i, '')
     .replace(/\b(original )?motion picture\b.*$/i, '')
     .replace(/\s+(ost|o\.s\.t\.?)$/i, '')
