@@ -14,7 +14,7 @@ const slots = [0, 1].map(i => {
   const wrap = document.createElement('div');
   wrap.className = 'bgvid yt';
   layer.append(video, wrap);
-  const slot = { i, video, wrap, kind: null, player: null, ready: false, failed: false, wantPlay: false, start: 0 };
+  const slot = { i, video, wrap, kind: null, player: null, ready: false, failed: false, wantPlay: false, start: 0, clean: false, showTimer: 0 };
   video.addEventListener('playing', () => slot.kind === 'mp4' && video.classList.add('playing'));
   video.addEventListener('error', () => { if (slot.kind === 'mp4') slot.failed = true; });
   return slot;
@@ -35,7 +35,16 @@ function loadYouTube() {
   return ytPromise;
 }
 
+// Sur iPhone, une vidéo YouTube qui repart après une pause affiche ses boutons (lecture, ±10 s) quelques secondes.
+// Elle n'apparaît donc qu'une fois ces boutons disparus, sauf si elle n'a jamais été mise en pause.
+const CONTROLS_FADE = 3200;
+function showYt(slot, delay) {
+  clearTimeout(slot.showTimer);
+  slot.showTimer = setTimeout(() => { if (slot.wantPlay && !slot.failed) slot.wrap.classList.add('playing'); }, delay);
+}
+
 function reset(slot) {
+  clearTimeout(slot.showTimer);
   slot.video.classList.remove('active', 'playing');
   slot.wrap.classList.remove('active', 'playing');
   slot.video.pause();
@@ -44,7 +53,7 @@ function reset(slot) {
   try { slot.player?.destroy(); } catch { /* ignore */ }
   slot.player = null;
   slot.wrap.innerHTML = '';
-  Object.assign(slot, { kind: null, ready: false, failed: false, wantPlay: false });
+  Object.assign(slot, { kind: null, ready: false, failed: false, wantPlay: false, clean: false });
 }
 
 // Prépare la vidéo de q dans l'emplacement qui n'est pas utilisé par la manche en cours.
@@ -76,12 +85,18 @@ export async function prepareBackground(q, busySlot) {
       onReady: e => {
         slot.ready = true;
         e.target.mute();
-        e.target.playVideo(); // on lance pour remplir le tampon, puis on met en pause tant que c'est caché
+        // Lancée tout de suite, cachée et muette, et jamais mise en pause avant la révélation : une pause ferait
+        // réapparaître les boutons du lecteur au moment où la vidéo devient visible.
+        e.target.playVideo();
       },
       onStateChange: e => {
-        if (e.data === YT.PlayerState.PLAYING) {
-          if (slot.wantPlay) slot.wrap.classList.add('playing');
-          else e.target.pauseVideo();
+        const S = YT.PlayerState;
+        if (e.data === S.PLAYING) {
+          if (!slot.wantPlay) slot.clean = true;
+          else showYt(slot, slot.clean ? 0 : CONTROLS_FADE);
+        } else if (e.data === S.PAUSED || e.data === S.ENDED) {
+          slot.clean = false;
+          if (slot.wantPlay) { clearTimeout(slot.showTimer); slot.wrap.classList.remove('playing'); }
         }
       },
       onError: () => { slot.failed = true; slot.wrap.classList.remove('playing'); },
@@ -101,7 +116,13 @@ export function startBackground(q) {
   } else {
     slot.wrap.classList.add('active');
     if (slot.ready) {
-      try { slot.player.seekTo(slot.start, true); slot.player.playVideo(); } catch { slot.failed = true; }
+      try {
+        // Déjà en lecture (cachée) : on revient au début de l'extrait, sans pause, donc sans boutons.
+        slot.clean = slot.clean && slot.player.getPlayerState() === YT.PlayerState.PLAYING;
+        slot.player.seekTo(slot.start, true);
+        slot.player.playVideo();
+        if (slot.clean) showYt(slot, 150);
+      } catch { slot.failed = true; }
     }
   }
   return true;
@@ -114,8 +135,10 @@ export function stopBackground(q, delay = 700) {
   slot.wantPlay = false;
   slot.video.classList.remove('active');
   slot.wrap.classList.remove('active');
+  clearTimeout(slot.showTimer);
   setTimeout(() => {
     if (slot.wantPlay) return;
+    slot.wrap.classList.remove('playing');
     slot.video.pause();
     try { slot.player?.pauseVideo(); } catch { /* ignore */ }
   }, delay);
@@ -125,7 +148,11 @@ export function pauseBackground(q, paused) {
   const slot = q?.bgSlot;
   if (!slot || !slot.wantPlay) return;
   if (slot.kind === 'mp4') paused ? slot.video.pause() : slot.video.play().catch(() => {});
-  else try { paused ? slot.player?.pauseVideo() : slot.player?.playVideo(); } catch { /* ignore */ }
+  else {
+    if (paused) { slot.clean = false; clearTimeout(slot.showTimer); slot.wrap.classList.remove('playing'); }
+    try { paused ? slot.player?.pauseVideo() : slot.player?.playVideo(); } catch { /* ignore */ }
+    if (!paused) showYt(slot, CONTROLS_FADE);
+  }
 }
 
 export function stopAllBackgrounds() { slots.forEach(reset); }
