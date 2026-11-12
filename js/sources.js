@@ -202,11 +202,14 @@ const POP_CATS = new Set(['films', 'series', 'disney', 'cartoons']);
 const PRIOR_RANGE = { easy: [0, 0.7], medium: [0, 0.9], hard: [0.15, 1], all: [0, 1] };
 // Œuvres d'autres catégories, repérées par leur description Wikipédia.
 const ANIM_DESC = /\banimation\b|dessins? animes?|serie animee|\bcartoon/;
+// i.dis : la page est classée en animation Disney/Pixar (la description de « La Reine des neiges »
+// dit seulement « film d'animation américain de 2013 »).
 const OWNED_ELSEWHERE = {
-  films: d => /disney|pixar/.test(d) && ANIM_DESC.test(d),       // classique d'animation Disney
-  series: d => ANIM_DESC.test(d),                                // série animée → Dessins animés
-  cartoons: d => /disney/.test(d),                               // série Disney → Disney
+  films: i => i.dis || (/disney|pixar/.test(i.d) && ANIM_DESC.test(i.d)), // classique d'animation Disney
+  series: i => ANIM_DESC.test(i.d),                                        // série animée → Dessins animés
+  cartoons: i => i.dis || /disney/.test(i.d),                              // série Disney → Disney
 };
+const DISNEY_CAT = /animation disney|d'animation de disney|pixar|disney television animation|disneytoon|s[ée]rie d'animation disney/i;
 // Type attendu de la page Wikipédia (évite « Saturday Night Fever (album) » pour le film).
 const POP_TYPE = {
   films: /\bfilms?\b/, disney: /\bfilms?\b|animation/, series: /serie|feuilleton|sitcom|telenovela/, cartoons: /anim|dessin/,
@@ -282,7 +285,7 @@ function inBand(catId, v, difficulty, deezerPos = 0.5) {
   return r >= a && r <= b;
 }
 
-const INFO_KEY = 'blindr.info';
+const INFO_KEY = 'blindr.info2'; // v2 : + catégories Disney
 const infoCache = load(INFO_KEY, {});
 // Page Wikipédia française de l'œuvre : vues, description et image, en une seule requête.
 async function workInfo(catId, name) {
@@ -291,7 +294,7 @@ async function workInfo(catId, name) {
   if (key in infoCache) return infoCache[key];
   const u = 'https://fr.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1' +
     `&generator=search&gsrlimit=4&gsrsearch=${encodeURIComponent(`${name} ${WIKI_HINT[catId] || ''}`)}` +
-    '&prop=pageviews|description|pageimages&pvipdays=60&piprop=thumbnail&pithumbsize=1000';
+    '&prop=pageviews|description|pageimages|categories&cllimit=max&pvipdays=60&piprop=thumbnail&pithumbsize=1000';
   const d = await wikiFetch(u);
   const pages = Object.values(d.query?.pages || {}).sort((x, y) => x.index - y.index)
     .filter(p => !NOT_WORK.test(norm(p.description || '')));
@@ -310,6 +313,8 @@ async function workInfo(catId, name) {
       v: days.length ? Math.round(days.reduce((a, x) => a + x, 0) / days.length) : null,
       d: norm(page.description || ''),
       img: page.thumbnail?.source || null,
+      dis: (page.categories || []).some(c => DISNEY_CAT.test(c.title)) ||
+        ((page.categories || []).some(c => /Portail:Disney/.test(c.title)) && (page.categories || []).some(c => /d'animation/i.test(c.title))),
     };
     if (info.v != null) {
       const bucket = (popStore.cat[catId] ||= {});
@@ -378,7 +383,7 @@ async function deezerQuestion(catId, difficulty) {
     if (POP_CATS.has(catId)) {
       info = await workInfo(catId, title).catch(() => undefined);
       // Œuvre qui appartient à une autre catégorie (Disney, anime, dessin animé).
-      if (info && OWNED_ELSEWHERE[catId]?.(info.d)) { reject(t.id); continue; }
+      if (info && OWNED_ELSEWHERE[catId]?.(info)) { reject(t.id); continue; }
       if (info !== undefined) rememberPop(t.id, info?.v ?? null);
     }
     if (catId === 'cartoons' && await inAnimeCategory(title).catch(() => false)) { reject(t.id); continue; }
